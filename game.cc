@@ -1,10 +1,10 @@
 #include "game.h"
 
-const Square & Square::operator=(const Square & other)
+const Square &Square::operator=(const Square &other)
 {
 	if (*this == other)
 		return *this;
-	
+
 	x = other.x;
 	y = other.y;
 	occupant = other.occupant;
@@ -23,11 +23,11 @@ Board::Board()
 	}
 }
 
-const Board & Board::operator=(const Board & other)
+const Board &Board::operator=(const Board &other)
 {
 	if (squares == other.squares)
 		return *this;
-	
+
 	squares = other.squares;
 	return *this;
 }
@@ -118,7 +118,7 @@ char Board::gameStatus() const
 
 void Board::clear()
 {
-	for (auto it : squares)
+	for (auto &it : squares)
 	{
 		if (it.getPlayer() != Nobody)
 			it.setPlayer(Nobody);

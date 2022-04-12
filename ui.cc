@@ -157,6 +157,21 @@ void Woo::processEvents()
 					break;
 				}
 			}
+			else
+			{
+				switch (event.key.code)
+				{
+				case sf::Keyboard::Z:
+					undo();
+					gameOver = false;
+					break;
+				case sf::Keyboard::R:
+					restart();
+					break;
+				default:
+					break;
+				}
+			}
 			break;
 		default:
 			break;

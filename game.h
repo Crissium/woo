@@ -13,28 +13,35 @@ enum Player
 
 class Square
 {
-	private:
+private:
 	int x;
 	int y;
 	Player occupant;
 
-	public:
-	Square(int p = 0, int q = 0, Player occupier = Nobody): x(p), y(q), occupant(occupier) {}
-	void setCoord(int p, int q) {x = p; y = q;}
-	void setPlayer(Player occupier) {occupant = occupier;}
-	int getX() const {return x;}
-	int getY() const {return y;}
-	Player getPlayer() const {return occupant;}
-	bool operator==(const Square & other) const {return (x == other.x && y == other.y);}
-	const Square & operator=(const Square & other);
+public:
+	Square(int p = 0, int q = 0, Player occupier = Nobody) : x(p), y(q), occupant(occupier) {}
+	void setCoord(int p, int q)
+	{
+		x = p;
+		y = q;
+	}
+	void setPlayer(Player occupier) { occupant = occupier; }
+	int getX() const { return x; }
+	int getY() const { return y; }
+	Player getPlayer() const { return occupant; }
+	bool operator==(const Square &other) const { return (x == other.x && y == other.y); }
+	const Square &operator=(const Square &other);
 };
 
 class Board
 {
-	public:
-	enum {SideLen = 15};
+public:
+	enum
+	{
+		SideLen = 15
+	};
 
-	private:
+private:
 	std::array<Square, SideLen * SideLen> squares;
 
 	bool draw() const;
@@ -43,12 +50,12 @@ public:
 	Board();
 	~Board() {}
 
-	const Board & operator=(const Board & other);
+	const Board &operator=(const Board &other);
 
-	Square & getSquare(int x, int y) {return squares.at(x + y * SideLen);}
-	const Square & getSquare(int x, int y) const {return squares.at(x + y * SideLen);}
-	bool coordValid(int x, int y) const {return (x >= 0 && x < SideLen && y >= 0 && y < SideLen);}
-	bool squareOccupied(int x, int y) {return (getSquare(x, y).getPlayer() != Nobody);}
+	Square &getSquare(int x, int y) { return squares.at(x + y * SideLen); }
+	const Square &getSquare(int x, int y) const { return squares.at(x + y * SideLen); }
+	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
+	bool squareOccupied(int x, int y) { return (getSquare(x, y).getPlayer() != Nobody); }
 
 	/**
 	 * Return 'r' if game is not over and still Running;
@@ -66,7 +73,7 @@ public:
 
 class Game
 {
-	private:
+private:
 	Board board;
 	std::vector<Square> occupiedSquares;
 
@@ -75,10 +82,10 @@ class Game
 	bool placePiece(int x, int y);
 
 public:
-	Game(): currentPlayer(X) {}
+	Game() : currentPlayer(X) {}
 
-	Player getCurrentPlayer() const {return currentPlayer;}
-	bool makeMove(int x, int y) {return placePiece(x, y);}
+	Player getCurrentPlayer() const { return currentPlayer; }
+	bool makeMove(int x, int y) { return placePiece(x, y); }
 	void undo();
 	void restart();
 
@@ -88,9 +95,9 @@ public:
 	 * 'o' if O has won;
 	 * 'd' if a draw.
 	 */
-	char gameStatus() const {return board.gameStatus();}
+	char gameStatus() const { return board.gameStatus(); }
 
-	const std::vector<Square> & getPlacedPiecesList() const {return occupiedSquares;}
+	const std::vector<Square> &getPlacedPiecesList() const { return occupiedSquares; }
 };
 
 #endif
