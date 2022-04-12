@@ -23,6 +23,15 @@ Board::Board()
 	}
 }
 
+const Board & Board::operator=(const Board & other)
+{
+	if (squares == other.squares)
+		return *this;
+	
+	squares = other.squares;
+	return *this;
+}
+
 bool Board::draw() const
 {
 	for (int x = 0; x < SideLen; ++x)
@@ -107,6 +116,15 @@ char Board::gameStatus() const
 		return 'r';
 }
 
+void Board::clear()
+{
+	for (auto it : squares)
+	{
+		if (it.getPlayer() != Nobody)
+			it.setPlayer(Nobody);
+	}
+}
+
 bool Game::placePiece(int x, int y)
 {
 	if (board.coordValid(x, y) && !board.squareOccupied(x, y))
@@ -138,3 +156,9 @@ void Game::undo()
 	occupiedSquares.pop_back();
 }
 
+void Game::restart()
+{
+	board.clear();
+	occupiedSquares.clear();
+	currentPlayer = X;
+}

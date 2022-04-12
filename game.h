@@ -43,6 +43,10 @@ class Board
 
 public:
 	Board();
+	~Board() {}
+
+	const Board & operator=(const Board & other);
+
 	Square & getSquare(int x, int y) {return squares.at(x + y * SideLen);}
 	const Square & getSquare(int x, int y) const {return squares.at(x + y * SideLen);}
 	bool coordValid(int x, int y) const {return (x >= 0 && x < SideLen && y >= 0 && y < SideLen);}
@@ -55,6 +59,11 @@ public:
 	 * 'd' if a draw.
 	 */
 	char gameStatus() const;
+
+	/**
+	 * Set all squares to unoccupied.
+	 */
+	void clear();
 };
 
 class Game
@@ -73,6 +82,7 @@ public:
 	Player getCurrentPlayer() const {return currentPlayer;}
 	bool makeMove(int x, int y) {return placePiece(x, y);}
 	void undo();
+	void restart();
 
 	/**
 	 * Return 'r' if game is not over and still Running;

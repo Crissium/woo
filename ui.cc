@@ -113,6 +113,15 @@ void Woo::undo()
 	}
 }
 
+void Woo::restart()
+{
+	game.restart();
+	gameOver = false;
+
+	XPieces.clear();
+	OPieces.clear();
+}
+
 void Woo::processEvents()
 {
 	sf::Event event;
@@ -140,6 +149,9 @@ void Woo::processEvents()
 				{
 				case sf::Keyboard::Z:
 					undo();
+					break;
+				case sf::Keyboard::R:
+					restart();
 					break;
 				default:
 					break;

@@ -117,6 +117,7 @@ private:
 
 	bool placePiece(sf::Vector2i position);
 	void undo();
+	void restart();
 
 	void processEvents();
 	void drawLines();
