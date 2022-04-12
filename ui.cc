@@ -104,10 +104,13 @@ bool Woo::placePiece(sf::Vector2i position)
 
 void Woo::undo()
 {
-	game.undo();
+	if (!XPieces.empty() && !OPieces.empty())
+	{
+		game.undo();
 
-	XPieces.pop_back();
-	OPieces.pop_back();
+		XPieces.pop_back();
+		OPieces.pop_back();
+	}
 }
 
 void Woo::processEvents()
