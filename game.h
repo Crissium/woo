@@ -20,8 +20,6 @@ class Square
 
 	public:
 	Square(int p = 0, int q = 0, Player occupier = Nobody): x(p), y(q), occupant(occupier) {}
-	void setX(int p) {x = p;}
-	void setY(int q) {y = q;}
 	void setCoord(int p, int q) {x = p; y = q;}
 	void setPlayer(Player occupier) {occupant = occupier;}
 	int getX() const {return x;}
