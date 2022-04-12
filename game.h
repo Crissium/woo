@@ -69,6 +69,8 @@ class Game
 
 public:
 	Game(): currentPlayer(X) {}
+
+	Player getCurrentPlayer() const {return currentPlayer;}
 	bool makeMove(int x, int y) {return placePiece(x, y);}
 	void undo();
 

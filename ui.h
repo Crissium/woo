@@ -116,8 +116,8 @@ private:
 	std::vector<OSprite> OPieces;
 
 	bool placePiece(sf::Vector2i position);
+	void undo();
 
-	void syncRenderedObjects();
 	void processEvents();
 	void drawLines();
 	void render();

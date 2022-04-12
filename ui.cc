@@ -59,27 +59,6 @@ OSprite::OSprite()
 	setColor(sf::Color::Blue);
 }
 
-void Woo::syncRenderedObjects()
-{
-	std::vector<Square> placedPieces = game.getPlacedPiecesList();
-
-	for (auto const it : placedPieces)
-	{
-		if (it.getPlayer() == X)
-		{
-			XSprite x;
-			x.setPosition(it.getX() * PixelsPerUnit, it.getY() * PixelsPerUnit);
-			XPieces.push_back(x);
-		}
-		else
-		{
-			OSprite o;
-			o.setPosition(it.getX() * PixelsPerUnit, it.getY() * PixelsPerUnit);
-			OPieces.push_back(o);
-		}
-	}
-}
-
 void Woo::drawLines()
 {
 	for (int x = 1; x < Board::SideLen; ++x)
@@ -103,12 +82,33 @@ bool Woo::placePiece(sf::Vector2i position)
 
 	if (game.makeMove(x, y))
 	{
+		if (game.getCurrentPlayer() == X) // Player changes when a move is made
+		{
+			OSprite o;
+			o.setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
+			OPieces.push_back(o);
+		}
+		else
+		{
+			XSprite s;
+			s.setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
+			XPieces.push_back(s);
+		}
+
 		if (game.gameStatus() != 'r')
 			gameOver = true;
 		return true;
 	}
 	else
 		return false;
+}
+
+void Woo::undo()
+{
+	game.undo();
+
+	XPieces.pop_back();
+	OPieces.pop_back();
 }
 
 void Woo::processEvents()
@@ -127,9 +127,7 @@ void Woo::processEvents()
 			{
 				if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 				{
-					placePiece(sf::Mouse::getPosition(window))
-						;
-					syncRenderedObjects();
+					placePiece(sf::Mouse::getPosition(window));
 				}
 			}
 			break;
@@ -139,8 +137,7 @@ void Woo::processEvents()
 				switch (event.key.code)
 				{
 				case sf::Keyboard::Z:
-					game.undo();
-					syncRenderedObjects();
+					undo();
 					break;
 				default:
 					break;

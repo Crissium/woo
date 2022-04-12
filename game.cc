@@ -124,13 +124,14 @@ bool Game::placePiece(int x, int y)
 void Game::undo()
 {
 	auto lastMove = occupiedSquares.end();
+	--lastMove;
 	int x = lastMove->getX();
 	int y = lastMove->getY();
-	
 	board.getSquare(x, y).setPlayer(Nobody);
 	occupiedSquares.pop_back();
 
 	lastMove = occupiedSquares.end();
+	--lastMove;
 	x = lastMove->getX();
 	y = lastMove->getY();
 	board.getSquare(x, y).setPlayer(Nobody);
