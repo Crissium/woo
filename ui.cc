@@ -183,12 +183,12 @@ void Woo::render()
 {
 	drawLines();
 
-	for (auto const x : XPieces)
+	for (auto const &x : XPieces)
 	{
 		window.draw(x);
 	}
 
-	for (auto const o : OPieces)
+	for (auto const &o : OPieces)
 	{
 		window.draw(o);
 	}
