@@ -2,9 +2,19 @@
 #include <ctime>
 #include <cstdlib>
 
+const X1 XSprite::x1;
+const X2 XSprite::x2;
+const X3 XSprite::x3;
+const X4 XSprite::x4;
+const X5 XSprite::x5;
+const O1 OSprite::o1;
+const O2 OSprite::o2;
+const O3 OSprite::o3;
+const O4 OSprite::o4;
+const O5 OSprite::o5;
+
 XSprite::XSprite()
 {
-	srand(time(nullptr));
 	switch (rand() % 5)
 	{
 	case 0:
@@ -28,7 +38,6 @@ XSprite::XSprite()
 
 OSprite::OSprite()
 {
-	srand(time(nullptr));
 	switch (rand() % 5)
 	{
 	case 0:
@@ -53,9 +62,6 @@ OSprite::OSprite()
 void Woo::syncRenderedObjects()
 {
 	std::vector<Square> placedPieces = game.getPlacedPiecesList();
-
-	XPieces.clear();
-	OPieces.clear();
 
 	for (auto const it : placedPieces)
 	{

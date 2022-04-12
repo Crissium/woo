@@ -80,11 +80,11 @@ public:
 class XSprite : public sf::Sprite
 {
 private:
-	const X1 x1;
-	const X2 x2;
-	const X3 x3;
-	const X4 x4;
-	const X5 x5;
+	const static X1 x1;
+	const static X2 x2;
+	const static X3 x3;
+	const static X4 x4;
+	const static X5 x5;
 
 public:
 	XSprite();
@@ -94,11 +94,11 @@ public:
 class OSprite : public sf::Sprite
 {
 private:
-	const O1 o1;
-	const O2 o2;
-	const O3 o3;
-	const O4 o4;
-	const O5 o5;
+	const static O1 o1;
+	const static O2 o2;
+	const static O3 o3;
+	const static O4 o4;
+	const static O5 o5;
 
 public:
 	OSprite();
