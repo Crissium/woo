@@ -2,6 +2,8 @@
 #define UI_H_
 
 #include "game.h"
+#include <cstdlib>
+#include <ctime>
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 
@@ -10,7 +12,7 @@
 class X1 : public sf::Texture
 {
 public:
-	X1() { loadFromFile("x1.png"); }
+	X1() { srand(time(nullptr)); loadFromFile("x1.png"); }
 	virtual ~X1() {}
 };
 

@@ -1,5 +1,4 @@
 #include "ui.h"
-#include <cstdlib>
 
 const X1 XSprite::x1;
 const X2 XSprite::x2;
