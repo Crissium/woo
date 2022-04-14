@@ -12,7 +12,7 @@
 class X1 : public sf::Texture
 {
 public:
-	X1() { srand(time(nullptr)); loadFromFile("x1.png"); }
+	X1() { loadFromFile("x1.png"); }
 	virtual ~X1() {}
 };
 
@@ -126,7 +126,7 @@ private:
 	void render();
 
 public:
-	Woo() : gameOver(false), window(sf::VideoMode(Board::SideLen * PixelsPerUnit, Board::SideLen * PixelsPerUnit), "Woo", sf::Style::Close | sf::Style::Titlebar) {}
+	Woo() : gameOver(false), window(sf::VideoMode(Board::SideLen * PixelsPerUnit, Board::SideLen * PixelsPerUnit), "Woo", sf::Style::Close | sf::Style::Titlebar) { srand(time(nullptr)); }
 	~Woo() {}
 
 	void run();
