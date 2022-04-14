@@ -11,7 +11,7 @@ const O3 OSprite::o3;
 const O4 OSprite::o4;
 const O5 OSprite::o5;
 
-XSprite::XSprite()
+XSprite::XSprite(int x, int y)
 {
 	switch (rand() % 5)
 	{
@@ -31,10 +31,10 @@ XSprite::XSprite()
 		setTexture(x5);
 		break;
 	}
-	setColor(sf::Color::Red);
+	setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
 }
 
-OSprite::OSprite()
+OSprite::OSprite(int x, int y)
 {
 	switch (rand() % 5)
 	{
@@ -54,7 +54,7 @@ OSprite::OSprite()
 		setTexture(o5);
 		break;
 	}
-	setColor(sf::Color::Blue);
+	setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
 }
 
 void Woo::drawLines()
@@ -82,15 +82,11 @@ bool Woo::placePiece(sf::Vector2i position)
 	{
 		if (game.getCurrentPlayer() == X) // Player changes when a move is made
 		{
-			OSprite o;
-			o.setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
-			OPieces.push_back(o);
+			OPieces.push_back(OSprite(x, y));
 		}
 		else
 		{
-			XSprite s;
-			s.setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
-			XPieces.push_back(s);
+			XPieces.push_back(XSprite(x, y));
 		}
 
 		if (game.gameStatus() != 'r')

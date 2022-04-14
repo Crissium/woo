@@ -89,7 +89,7 @@ private:
 	const static X5 x5;
 
 public:
-	XSprite();
+	XSprite(int x, int y);
 	virtual ~XSprite() {}
 };
 
@@ -103,7 +103,7 @@ private:
 	const static O5 o5;
 
 public:
-	OSprite();
+	OSprite(int x, int y);
 	virtual ~OSprite() {}
 };
 
