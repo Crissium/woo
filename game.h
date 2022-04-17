@@ -66,7 +66,7 @@ public:
 	char gameStatus() const;
 
 	/**
-	 * Set all squares to unoccupied.
+	 * Reset all squares to unoccupied.
 	 */
 	void clear();
 };
