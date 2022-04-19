@@ -9,6 +9,8 @@
 
 #define PixelsPerUnit 40.f
 
+extern const unsigned int ConsoleHeight;
+
 class X1 : public sf::Texture
 {
 public:
@@ -107,6 +109,16 @@ public:
 	virtual ~OSprite() {}
 };
 
+class Status : public sf::Text
+{
+	private:
+	sf::Font font;
+	public:
+	Status();
+	virtual ~Status() {}
+	void updateStatus(char gameStatus);
+};
+
 class Woo
 {
 private:
@@ -114,6 +126,7 @@ private:
 	bool gameOver;
 
 	sf::RenderWindow window;
+	Status status;
 	std::vector<XSprite> XPieces;
 	std::vector<OSprite> OPieces;
 
@@ -126,7 +139,7 @@ private:
 	void render();
 
 public:
-	Woo() : gameOver(false), window(sf::VideoMode(Board::SideLen * PixelsPerUnit, Board::SideLen * PixelsPerUnit), "Woo", sf::Style::Close | sf::Style::Titlebar) { srand(time(nullptr)); }
+	Woo() : gameOver(false), window(sf::VideoMode(Board::SideLen * PixelsPerUnit, Board::SideLen * PixelsPerUnit + ConsoleHeight), "Woo", sf::Style::Close | sf::Style::Titlebar) { srand(time(nullptr)); }
 	~Woo() {}
 
 	void run();

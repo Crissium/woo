@@ -1,5 +1,6 @@
 #include "ui.h"
 
+const unsigned int ConsoleHeight = 1.5f * PixelsPerUnit;
 const X1 XSprite::x1;
 const X2 XSprite::x2;
 const X3 XSprite::x3;
@@ -57,6 +58,38 @@ OSprite::OSprite(int x, int y)
 	setPosition(x * PixelsPerUnit, y * PixelsPerUnit);
 }
 
+Status::Status()
+{
+	font.loadFromFile("/usr/share/fonts/truetype/MinionPro-Regular.otf");
+	setFont(font);
+
+	setPosition(0.f, Board::SideLen * PixelsPerUnit);
+	setString("Status: running. Press 'Z' to undo, 'R' to restart.");
+	setFillColor(sf::Color::Black);
+	setCharacterSize(30);
+}
+
+void Status::updateStatus(char gameStatus)
+{
+	switch (gameStatus)
+	{
+		case 'x':
+			setString("Status: X has won! Press 'Z' to undo, 'R' to restart.");
+			break;
+		case 'o':
+			setString("Status: O has won! Press 'Z' to undo, 'R' to restart.");
+			break;
+		case 'd':
+			setString("Status: game ended in a draw. Press 'Z' to undo,\n\t'R' to restart.");
+			break;
+		case 'r':
+			setString("Status: running. Press 'Z' to undo, 'R' to restart.");
+			break;
+		default:
+		break;
+	}
+}
+
 void Woo::drawLines()
 {
 	for (int x = 1; x < Board::SideLen; ++x)
@@ -65,7 +98,7 @@ void Woo::drawLines()
 		window.draw(separator, 2, sf::Lines);
 	}
 
-	for (int y = 1; y < Board::SideLen; ++y)
+	for (int y = 1; y <= Board::SideLen; ++y)
 	{
 		sf::Vertex separator[] = {sf::Vertex(sf::Vector2f(0.f, y * PixelsPerUnit)),
 								  sf::Vertex(sf::Vector2f(Board::SideLen * PixelsPerUnit, y * PixelsPerUnit))};
@@ -89,6 +122,8 @@ bool Woo::placePiece(sf::Vector2i position)
 			XPieces.push_back(XSprite(x, y));
 		}
 
+		status.updateStatus(game.gameStatus());
+
 		if (game.gameStatus() != 'r')
 			gameOver = true;
 		return true;
@@ -105,6 +140,8 @@ void Woo::undo()
 
 		XPieces.pop_back();
 		OPieces.pop_back();
+
+		status.updateStatus(game.gameStatus());
 	}
 }
 
@@ -177,6 +214,8 @@ void Woo::processEvents()
 void Woo::render()
 {
 	drawLines();
+
+	window.draw(status);
 
 	for (auto const &x : XPieces)
 	{
