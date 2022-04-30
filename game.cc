@@ -323,7 +323,7 @@ int BoardAnalyser::analysisResult() const
 {
 	int result = 0;
 
-	for (auto const & strip : analysedStrips)
+	for (auto const &strip : analysedStrips)
 	{
 		result += getScoreOfStrip(strip);
 	}
@@ -370,9 +370,8 @@ void Game::evaluateBoard()
 	oScoreSum = std::accumulate(oScores.begin(), oScores.end(), 0L, [](long previousSum, int i)
 								{ return previousSum + i; });
 
-
 	xMaxLocations.clear();
-	xMaxLocations.push_back({0,0});
+	xMaxLocations.push_back({0, 0});
 	for (int x = 0; x < Board::SideLen; ++x)
 	{
 		for (int y = 0; y < Board::SideLen; ++y)
@@ -414,13 +413,16 @@ void Game::printScores() const
 {
 	/** \FIXME Please note that for some mysterious reason, x and y are reversed! */
 	std::ofstream fout("XScores.txt");
-	
-	fout << "X Score Table\n" << "Score sum = " << xScoreSum << '\n' << "Maximum score location(s): ";
-	for (auto const & location : xMaxLocations)
+
+	fout << "X Score Table\n"
+		 << "Score sum = " << xScoreSum << '\n'
+		 << "Maximum score location(s): ";
+	for (auto const &location : xMaxLocations)
 	{
 		fout << '(' << location.at(1) + 1 << ", " << location.at(0) + 1 << ") ";
 	}
-	fout << '\n' << '\n';
+	fout << '\n'
+		 << '\n';
 
 	for (int y = 0; y < Board::SideLen; ++y)
 	{
