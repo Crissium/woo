@@ -3,12 +3,14 @@
 
 #include <array>
 #include <vector>
+#include <string>
 
 enum Player
 {
 	Nobody,
 	X,
-	O
+	O,
+	Invalid
 };
 
 class Square
@@ -31,6 +33,14 @@ public:
 	Player getPlayer() const { return occupant; }
 	bool operator==(const Square &other) const { return (x == other.x && y == other.y); }
 	const Square &operator=(const Square &other);
+};
+
+class PieceStrip : public std::array<Player, 4 + 1 + 4>
+{
+public:
+	PieceStrip() {}
+	~PieceStrip() {}
+	void setPlayer(size_t index, Player player) { at(index) = player; }
 };
 
 class Board
@@ -57,6 +67,8 @@ public:
 	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
 	bool squareOccupied(int x, int y) { return (getSquare(x, y).getPlayer() != Nobody); }
 
+	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
+
 	/**
 	 * Return 'r' if game is not over and still Running;
 	 * 'x' if X has won;
@@ -69,6 +81,25 @@ public:
 	 * Reset all squares to unoccupied.
 	 */
 	void clear();
+};
+
+class BoardAnalyser
+{
+	private:
+	Player evaluatedPlayer;
+	std::array<PieceStrip, 4 /* Num of directions */> analysedStrips;
+
+	static const std::array<const std::string, 22> Patterns;
+	int scoreOfPattern(size_t patternSubscript) const;
+
+	/** Return score for match */
+	int getScoreOfStrip(const PieceStrip &) const;
+
+	public:
+	BoardAnalyser(const Board & analysedBoard, int x, int y, Player analysedPlayer);
+	~BoardAnalyser() {}
+
+	int analysisResult() const;
 };
 
 class Game

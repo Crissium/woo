@@ -73,19 +73,19 @@ void Status::updateStatus(char gameStatus)
 {
 	switch (gameStatus)
 	{
-		case 'x':
-			setString("Status: X has won! Press 'Z' to undo, 'R' to restart.");
-			break;
-		case 'o':
-			setString("Status: O has won! Press 'Z' to undo, 'R' to restart.");
-			break;
-		case 'd':
-			setString("Status: game ended in a draw. Press 'Z' to undo,\n\t'R' to restart.");
-			break;
-		case 'r':
-			setString("Status: running. Press 'Z' to undo, 'R' to restart.");
-			break;
-		default:
+	case 'x':
+		setString("Status: X has won! Press 'Z' to undo, 'R' to restart.");
+		break;
+	case 'o':
+		setString("Status: O has won! Press 'Z' to undo, 'R' to restart.");
+		break;
+	case 'd':
+		setString("Status: game ended in a draw. Press 'Z' to undo,\n\t'R' to restart.");
+		break;
+	case 'r':
+		setString("Status: running. Press 'Z' to undo, 'R' to restart.");
+		break;
+	default:
 		break;
 	}
 }

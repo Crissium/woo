@@ -111,9 +111,10 @@ public:
 
 class Status : public sf::Text
 {
-	private:
+private:
 	sf::Font font;
-	public:
+
+public:
 	Status();
 	virtual ~Status() {}
 	void updateStatus(char gameStatus);
