@@ -1,5 +1,7 @@
 #include "game.h"
 #include <algorithm>
+#include <numeric>
+#include <fstream>
 
 const Square &Square::operator=(const Square &other)
 {
@@ -210,20 +212,20 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	{
 		if (coordValid(x, y - i))
 		{
-			surroundings.at(0).setPlayer(4 - i, getSquare(x, y - i).getPlayer());
+			surroundings.at(1).setPlayer(4 - i, getSquare(x, y - i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 - i, Invalid);
+			surroundings.at(1).setPlayer(4 - i, Invalid);
 		}
 
 		if (coordValid(x, y + i))
 		{
-			surroundings.at(0).setPlayer(4 + i, getSquare(x, y + i).getPlayer());
+			surroundings.at(1).setPlayer(4 + i, getSquare(x, y + i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 + i, Invalid);
+			surroundings.at(1).setPlayer(4 + i, Invalid);
 		}
 	}
 
@@ -233,20 +235,20 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	{
 		if (coordValid(x - i, y - i))
 		{
-			surroundings.at(0).setPlayer(4 - i, getSquare(x - i, y - i).getPlayer());
+			surroundings.at(2).setPlayer(4 - i, getSquare(x - i, y - i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 - i, Invalid);
+			surroundings.at(2).setPlayer(4 - i, Invalid);
 		}
 
 		if (coordValid(x + i, y + i))
 		{
-			surroundings.at(0).setPlayer(4 + i, getSquare(x + i, y + i).getPlayer());
+			surroundings.at(2).setPlayer(4 + i, getSquare(x + i, y + i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 + i, Invalid);
+			surroundings.at(2).setPlayer(4 + i, Invalid);
 		}
 	}
 
@@ -254,22 +256,22 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	surroundings.at(3).setPlayer(4, getSquare(x, y).getPlayer());
 	for (size_t i = 4; i > 0; --i)
 	{
-		if (coordValid(x + i, y + i))
+		if (coordValid(x + i, y - i))
 		{
-			surroundings.at(0).setPlayer(4 + i, getSquare(x + i, y + i).getPlayer());
+			surroundings.at(3).setPlayer(4 - i, getSquare(x + i, y - i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 + i, Invalid);
+			surroundings.at(3).setPlayer(4 - i, Invalid);
 		}
 
-		if (coordValid(x + i, y + i))
+		if (coordValid(x - i, y + i))
 		{
-			surroundings.at(0).setPlayer(4 + i, getSquare(x + i, y + i).getPlayer());
+			surroundings.at(3).setPlayer(4 + i, getSquare(x - i, y + i).getPlayer());
 		}
 		else
 		{
-			surroundings.at(0).setPlayer(4 + i, Invalid);
+			surroundings.at(3).setPlayer(4 + i, Invalid);
 		}
 	}
 
@@ -280,10 +282,10 @@ int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 {
 	int score = 0;
 	Player adversary = (evaluatedPlayer == X) ? O : X;
-	
+
 	for (size_t patternSubscript = 0; patternSubscript < 22; ++patternSubscript)
 	{
-		for (size_t pieceSubscript = 0; pieceSubscript < 9 - Patterns[patternSubscript].length(); ++pieceSubscript)
+		for (size_t pieceSubscript = 0; pieceSubscript <= 9 - Patterns[patternSubscript].length(); ++pieceSubscript)
 		{
 			std::string searched;
 
@@ -309,9 +311,9 @@ int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 	return score;
 }
 
-BoardAnalyser::BoardAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer) :evaluatedPlayer(analysedPlayer), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
+BoardAnalyser::BoardAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer) : evaluatedPlayer(analysedPlayer), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
 {
-	for (auto & strip : analysedStrips)
+	for (auto &strip : analysedStrips)
 	{
 		strip.setPlayer(4, analysedPlayer);
 	}
@@ -329,6 +331,128 @@ int BoardAnalyser::analysisResult() const
 	return result;
 }
 
+void Game::updateScoreOfSquare(int x, int y, Player player)
+{
+	if (board.squareOccupied(x, y))
+	{
+		getXScoreOfSquare(x, y) = 0;
+		getOScoreOfSquare(x, y) = 0;
+	}
+
+	else
+	{
+		BoardAnalyser analyser(board, x, y, player);
+
+		if (player == X)
+		{
+			getXScoreOfSquare(x, y) = analyser.analysisResult();
+		}
+		else
+		{
+			getOScoreOfSquare(x, y) = analyser.analysisResult();
+		}
+	}
+}
+
+void Game::evaluateBoard()
+{
+	for (int x = 0; x < Board::SideLen; ++x)
+	{
+		for (int y = 0; y < Board::SideLen; ++y)
+		{
+			updateScoreOfSquare(x, y, X);
+			updateScoreOfSquare(x, y, O);
+		}
+	}
+
+	xScoreSum = std::accumulate(xScores.begin(), xScores.end(), 0L, [](long previousSum, int i)
+								{ return previousSum + i; });
+	oScoreSum = std::accumulate(oScores.begin(), oScores.end(), 0L, [](long previousSum, int i)
+								{ return previousSum + i; });
+
+
+	xMaxLocations.clear();
+	xMaxLocations.push_back({0,0});
+	for (int x = 0; x < Board::SideLen; ++x)
+	{
+		for (int y = 0; y < Board::SideLen; ++y)
+		{
+			if (getXScoreOfSquare(x, y) > getXScoreOfSquare(xMaxLocations.at(0)))
+			{
+				xMaxLocations.clear();
+				xMaxLocations.push_back({x, y});
+			}
+			else if (getXScoreOfSquare(x, y) == getXScoreOfSquare(xMaxLocations.at(0)))
+			{
+				xMaxLocations.push_back({x, y});
+			}
+		}
+	}
+
+	oMaxLocations.clear();
+	oMaxLocations.push_back({0, 0});
+	for (int x = 0; x < Board::SideLen; ++x)
+	{
+		for (int y = 0; y < Board::SideLen; ++y)
+		{
+			if (getOScoreOfSquare(x, y) > getOScoreOfSquare(oMaxLocations.at(0)))
+			{
+				oMaxLocations.clear();
+				oMaxLocations.push_back({x, y});
+			}
+			else if (getOScoreOfSquare(x, y) == getOScoreOfSquare(oMaxLocations.at(0)))
+			{
+				oMaxLocations.push_back({x, y});
+			}
+		}
+	}
+
+	printScores();
+}
+
+void Game::printScores() const
+{
+	/** \FIXME Please note that for some mysterious reason, x and y are reversed! */
+	std::ofstream fout("XScores.txt");
+	
+	fout << "X Score Table\n" << "Score sum = " << xScoreSum << '\n' << "Maximum score location(s): ";
+	for (auto const & location : xMaxLocations)
+	{
+		fout << '(' << location.at(1) + 1 << ", " << location.at(0) + 1 << ") ";
+	}
+	fout << '\n' << '\n';
+
+	for (int y = 0; y < Board::SideLen; ++y)
+	{
+		for (int x = 0; x < Board::SideLen; ++x)
+		{
+			fout << getXScoreOfSquare(x, y) << " \n"[x == Board::SideLen - 1];
+		}
+	}
+
+	fout.close();
+
+	fout.open("OScores.txt");
+	fout << "O Score Table\n"
+		 << "Score sum = " << oScoreSum << '\n'
+		 << "Maximum score location(s): ";
+	for (auto const &location : oMaxLocations)
+	{
+		fout << '(' << location.at(1) + 1 << ", " << location.at(0) + 1 << ") ";
+	}
+	fout << '\n'
+		 << '\n';
+
+	for (int y = 0; y < Board::SideLen; ++y)
+	{
+		for (int x = 0; x < Board::SideLen; ++x)
+		{
+			fout << getOScoreOfSquare(x, y) << " \n"[x == Board::SideLen - 1];
+		}
+	}
+	fout.close();
+}
+
 bool Game::placePiece(int x, int y)
 {
 	if (board.coordValid(x, y) && !board.squareOccupied(x, y))
@@ -337,6 +461,8 @@ bool Game::placePiece(int x, int y)
 		occupiedSquares.push_back(board.getSquare(x, y));
 
 		currentPlayer = ((currentPlayer == X) ? O : X);
+
+		evaluateBoard();
 		return true;
 	}
 	else
@@ -350,6 +476,8 @@ void Game::undo()
 
 	board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
 	occupiedSquares.pop_back();
+
+	evaluateBoard();
 }
 
 void Game::restart()
@@ -357,4 +485,6 @@ void Game::restart()
 	board.clear();
 	occupiedSquares.clear();
 	currentPlayer = X;
+
+	evaluateBoard();
 }

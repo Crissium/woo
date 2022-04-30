@@ -85,7 +85,7 @@ public:
 
 class BoardAnalyser
 {
-	private:
+private:
 	Player evaluatedPlayer;
 	std::array<PieceStrip, 4 /* Num of directions */> analysedStrips;
 
@@ -95,8 +95,8 @@ class BoardAnalyser
 	/** Return score for match */
 	int getScoreOfStrip(const PieceStrip &) const;
 
-	public:
-	BoardAnalyser(const Board & analysedBoard, int x, int y, Player analysedPlayer);
+public:
+	BoardAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
 	~BoardAnalyser() {}
 
 	int analysisResult() const;
@@ -110,10 +110,27 @@ private:
 
 	Player currentPlayer;
 
+	std::array<int, Board::SideLen * Board::SideLen> xScores;
+	std::array<int, Board::SideLen * Board::SideLen> oScores;
+	long xScoreSum;
+	long oScoreSum;
+	std::vector<std::array<int, 2>> xMaxLocations;
+	std::vector<std::array<int, 2>> oMaxLocations;
+
+	int getXScoreOfSquare(int x, int y) const { return xScores.at(x + y * Board::SideLen); }
+	int getXScoreOfSquare(const std::array<int, 2> &location) { return getXScoreOfSquare(location.at(0), location.at(1)); }
+	int &getXScoreOfSquare(int x, int y) { return xScores.at(x + y * Board::SideLen); }
+	int getOScoreOfSquare(int x, int y) const { return oScores.at(x + y * Board::SideLen); }
+	int getOScoreOfSquare(const std::array<int, 2> &location) { return getOScoreOfSquare(location.at(0), location.at(1)); }
+	int &getOScoreOfSquare(int x, int y) { return oScores.at(x + y * Board::SideLen); }
+
+	void updateScoreOfSquare(int x, int y, Player player);
+	void evaluateBoard();
+
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X) {}
+	Game() : currentPlayer(X), xScores({0}), oScores({0}), xScoreSum(0L), oScoreSum(0L) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
@@ -127,6 +144,9 @@ public:
 	 * 'd' if a draw.
 	 */
 	char gameStatus() const { return board.gameStatus(); }
+
+	/** Please note that for some mysterious reason, x and y are reversed! */
+	void printScores() const;
 
 	const std::vector<Square> &getPlacedPiecesList() const { return occupiedSquares; }
 };
