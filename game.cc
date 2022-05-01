@@ -281,7 +281,6 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 {
 	int score = 0;
-	Player adversary = (evaluatedPlayer == X) ? O : X;
 
 	for (size_t patternSubscript = 0; patternSubscript < 22; ++patternSubscript)
 	{
@@ -293,7 +292,7 @@ int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 			{
 				if (strip.at(pieceSubscript + i) == evaluatedPlayer)
 					searched.push_back('1');
-				else if (strip.at(pieceSubscript + i) == adversary)
+				else if (strip.at(pieceSubscript + i) == (evaluatedPlayer == X) ? O : X)
 					searched.push_back('2');
 				else if (strip.at(pieceSubscript + i) == Nobody)
 					searched.push_back('0');
@@ -321,14 +320,8 @@ BoardAnalyser::BoardAnalyser(const Board &analysedBoard, int x, int y, Player an
 
 int BoardAnalyser::analysisResult() const
 {
-	int result = 0;
-
-	for (auto const &strip : analysedStrips)
-	{
-		result += getScoreOfStrip(strip);
-	}
-
-	return result;
+	return std::accumulate(analysedStrips.cbegin(), analysedStrips.cend(), 0, [this](int previousScoreSum, const PieceStrip &s)
+						   { return previousScoreSum + getScoreOfStrip(s); });
 }
 
 void Game::updateScoreOfSquare(int x, int y, Player player)
@@ -341,15 +334,13 @@ void Game::updateScoreOfSquare(int x, int y, Player player)
 
 	else
 	{
-		BoardAnalyser analyser(board, x, y, player);
-
 		if (player == X)
 		{
-			getXScoreOfSquare(x, y) = analyser.analysisResult();
+			getXScoreOfSquare(x, y) = BoardAnalyser(board, x, y, X).analysisResult();
 		}
 		else
 		{
-			getOScoreOfSquare(x, y) = analyser.analysisResult();
+			getOScoreOfSquare(x, y) = BoardAnalyser(board, x, y, O).analysisResult();
 		}
 	}
 }
@@ -365,9 +356,9 @@ void Game::evaluateBoard()
 		}
 	}
 
-	xScoreSum = std::accumulate(xScores.begin(), xScores.end(), 0L, [](long previousSum, int i)
+	xScoreSum = std::accumulate(xScores.cbegin(), xScores.cend(), 0L, [](long previousSum, int i)
 								{ return previousSum + i; });
-	oScoreSum = std::accumulate(oScores.begin(), oScores.end(), 0L, [](long previousSum, int i)
+	oScoreSum = std::accumulate(oScores.cbegin(), oScores.cend(), 0L, [](long previousSum, int i)
 								{ return previousSum + i; });
 
 	xMaxLocations.clear();
