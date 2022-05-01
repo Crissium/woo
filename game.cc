@@ -292,7 +292,7 @@ int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 			{
 				if (strip.at(pieceSubscript + i) == evaluatedPlayer)
 					searched.push_back('1');
-				else if (strip.at(pieceSubscript + i) == (evaluatedPlayer == X) ? O : X)
+				else if (strip.at(pieceSubscript + i) == ((evaluatedPlayer == X) ? O : X))
 					searched.push_back('2');
 				else if (strip.at(pieceSubscript + i) == Nobody)
 					searched.push_back('0');
@@ -456,6 +456,7 @@ bool Game::placePiece(int x, int y)
 		currentPlayer = ((currentPlayer == X) ? O : X);
 
 		evaluateBoard();
+		
 		return true;
 	}
 	else
