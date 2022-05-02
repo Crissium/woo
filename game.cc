@@ -26,6 +26,8 @@ Board::Board()
 	}
 }
 
+const int Board::Directions[4][2] = {{1,0},{0,1},{1,1},{1,-1}};
+
 const Board &Board::operator=(const Board &other)
 {
 	if (squares == other.squares)
@@ -119,6 +121,29 @@ char Board::gameStatus() const
 		return 'r';
 }
 
+std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
+{
+	std::array<PieceStrip, 4> surroundings;
+
+	for (size_t direction = 0; direction < 4; ++direction)
+	{
+		for (int distance = 4; distance > 0; --distance)
+		{
+			if (coordValid(x + distance * Directions[direction][0], y + distance * Directions[direction][1]))
+				surroundings.at(direction).setPlayer(4 - distance, getSquare(x + distance * Directions[direction][0], y + distance * Directions[direction][1]).getPlayer());
+			else
+				surroundings.at(direction).setPlayer(4 - distance, Invalid);
+
+			if (coordValid(x - distance * Directions[direction][0], y - distance * Directions[direction][1]))
+				surroundings.at(direction).setPlayer(4 + distance, getSquare(x - distance * Directions[direction][0], y - distance * Directions[direction][1]).getPlayer());
+			else
+				surroundings.at(direction).setPlayer(4 + distance, Invalid);
+		}
+	}
+
+	return surroundings;
+}
+
 void Board::clear()
 {
 	for (auto &it : squares)
@@ -175,107 +200,6 @@ int BoardAnalyser::scoreOfPattern(size_t patternSubscript) const
 		break;
 	}
 	return score;
-}
-
-std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
-{
-	std::array<PieceStrip, 4> surroundings;
-
-	// -
-	surroundings.at(0).setPlayer(4, getSquare(x, y).getPlayer());
-	for (size_t i = 4; i > 0; --i)
-	{
-		// Left side
-		if (coordValid(x - i, y))
-		{
-			surroundings.at(0).setPlayer(4 - i, getSquare(x - i, y).getPlayer());
-		}
-		else
-		{
-			surroundings.at(0).setPlayer(4 - i, Invalid);
-		}
-
-		// Right side
-		if (coordValid(x + i, y))
-		{
-			surroundings.at(0).setPlayer(4 + i, getSquare(x + i, y).getPlayer());
-		}
-		else
-		{
-			surroundings.at(0).setPlayer(4 + i, Invalid);
-		}
-	}
-
-	// |
-	surroundings.at(1).setPlayer(4, getSquare(x, y).getPlayer());
-	for (size_t i = 4; i > 0; --i)
-	{
-		if (coordValid(x, y - i))
-		{
-			surroundings.at(1).setPlayer(4 - i, getSquare(x, y - i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(1).setPlayer(4 - i, Invalid);
-		}
-
-		if (coordValid(x, y + i))
-		{
-			surroundings.at(1).setPlayer(4 + i, getSquare(x, y + i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(1).setPlayer(4 + i, Invalid);
-		}
-	}
-
-	// '\'
-	surroundings.at(2).setPlayer(4, getSquare(x, y).getPlayer());
-	for (size_t i = 4; i > 0; --i)
-	{
-		if (coordValid(x - i, y - i))
-		{
-			surroundings.at(2).setPlayer(4 - i, getSquare(x - i, y - i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(2).setPlayer(4 - i, Invalid);
-		}
-
-		if (coordValid(x + i, y + i))
-		{
-			surroundings.at(2).setPlayer(4 + i, getSquare(x + i, y + i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(2).setPlayer(4 + i, Invalid);
-		}
-	}
-
-	// /
-	surroundings.at(3).setPlayer(4, getSquare(x, y).getPlayer());
-	for (size_t i = 4; i > 0; --i)
-	{
-		if (coordValid(x + i, y - i))
-		{
-			surroundings.at(3).setPlayer(4 - i, getSquare(x + i, y - i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(3).setPlayer(4 - i, Invalid);
-		}
-
-		if (coordValid(x - i, y + i))
-		{
-			surroundings.at(3).setPlayer(4 + i, getSquare(x - i, y + i).getPlayer());
-		}
-		else
-		{
-			surroundings.at(3).setPlayer(4 + i, Invalid);
-		}
-	}
-
-	return surroundings;
 }
 
 int BoardAnalyser::getScoreOfStrip(const PieceStrip &strip) const

@@ -54,6 +54,8 @@ public:
 private:
 	std::array<Square, SideLen * SideLen> squares;
 
+	static const int Directions[4][2];
+
 	bool draw() const;
 
 public:
