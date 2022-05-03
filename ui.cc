@@ -132,6 +132,23 @@ bool Woo::placePiece(sf::Vector2i position)
 		return false;
 }
 
+void Woo::autoPlace()
+{
+	game.autoMove();
+	
+	auto theMove = game.getLastestMovedSquare();
+	
+	if (theMove.getPlayer() == X)
+		XPieces.push_back(XSprite(theMove.getX(), theMove.getY()));
+	else
+		OPieces.push_back(OSprite(theMove.getX(), theMove.getY()));
+
+	status.updateStatus(game.gameStatus());
+
+	if (game.gameStatus() != 'r')
+		gameOver = true;
+}
+
 void Woo::undo()
 {
 	if (!XPieces.empty() && !OPieces.empty())
@@ -184,6 +201,9 @@ void Woo::processEvents()
 					break;
 				case sf::Keyboard::R:
 					restart();
+					break;
+				case sf::Keyboard::A:
+					autoPlace();
 					break;
 				default:
 					break;

@@ -132,6 +132,7 @@ private:
 	std::vector<OSprite> OPieces;
 
 	bool placePiece(sf::Vector2i position);
+	void autoPlace();
 	void undo();
 	void restart();
 

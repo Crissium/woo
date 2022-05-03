@@ -207,6 +207,7 @@ public:
 	/** Please note that for some mysterious reason, x and y are reversed! */
 	void printScores() const;
 
+	const Square & getLastestMovedSquare() const {return *occupiedSquares.crbegin();}
 	const std::vector<Square> &getPlacedPiecesList() const { return occupiedSquares; }
 };
 
