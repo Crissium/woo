@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <numeric>
 #include <fstream>
+#include <climits>
 
 const Square &Square::operator=(const Square &other)
 {
@@ -26,7 +27,7 @@ Board::Board()
 	}
 }
 
-const int Board::Directions[4][2] = {{1,0},{0,1},{1,1},{1,-1}};
+const int Board::Directions[4][2] = {{1, 0}, {0, 1}, {1, 1}, {1, -1}};
 
 const Board &Board::operator=(const Board &other)
 {
@@ -144,6 +145,17 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	return surroundings;
 }
 
+int Board::numSquaresOccupiedBy(Player player) const
+{
+	return std::accumulate(squares.cbegin(), squares.cend(), 0, [player](int previousSum, const Square &s)
+						   { return ((s.getPlayer() == player) ? (previousSum + 1) : previousSum); });
+}
+
+Player Board::getCurrentPlayer() const
+{
+	return ((numSquaresOccupiedBy(X) > numSquaresOccupiedBy(O)) ? O : X);
+}
+
 void Board::clear()
 {
 	for (auto &it : squares)
@@ -246,6 +258,97 @@ int BoardAnalyser::analysisResult() const
 {
 	return std::accumulate(analysedStrips.cbegin(), analysedStrips.cend(), 0, [this](int previousScoreSum, const PieceStrip &s)
 						   { return previousScoreSum + getScoreOfStrip(s); });
+}
+
+int GameState::boardAnalysisResult(Player player) const
+{
+	int sum = 0;
+	for (int x = 0; x < Board::SideLen; ++x)
+	{
+		for (int y = 0; y < Board::SideLen; ++y)
+		{
+			if (!board.squareOccupied(x, y))
+				sum += BoardAnalyser(board, x, y, player).analysisResult();
+		}
+	}
+	return sum;
+}
+
+int GameState::utility(Player player) const
+{
+	char status = board.gameStatus();
+
+	if (status == 'd')
+		return 0;
+	else if (status == 'r')
+	{
+		if (board.getCurrentPlayer() == player)
+		{
+			return boardAnalysisResult(player);
+		}
+		else
+		{
+			return -boardAnalysisResult(board.getCurrentPlayer());
+		}
+	}
+	else
+	{
+		if (player == ((status == 'x') ? X : O))
+			return INT_MAX;
+		else
+			return INT_MIN;
+	}
+}
+
+GameState GameState::result(const Coord &move) const
+{
+	Board newBoard(board);
+
+	newBoard.getSquare(move.x, move.y).setPlayer(board.getCurrentPlayer());
+
+	return GameState(newBoard);
+}
+
+std::vector<GameState::Coord> GameState::actions() const
+{
+	std::vector<GameState::Coord> moves;
+
+	for (int x = 0; x < Board::SideLen; ++x)
+	{
+		for (int y = 0; y < Board::SideLen; ++y)
+		{
+			if (board.squareOccupied(x, y))
+				moves.push_back(Coord(x, y));
+		}
+	}
+
+	return moves;
+}
+
+int GameState::minimax(Player player, int depth) const
+{
+	if (depth == 1 || terminal())
+	{
+		return utility(player);
+	}
+	else if (board.getCurrentPlayer() == player)
+	{
+		auto moves = actions();
+		std::vector<int> values;
+		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
+					   { return result(move).minimax(player, depth - 1); });
+		return std::accumulate(values.cbegin(), values.cend(), INT_MIN, [](int max, int current)
+							   { return ((max > current) ? max : current); });
+	}
+	else
+	{
+		auto moves = actions();
+		std::vector<int> values;
+		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
+					   { return result(move).minimax(player, depth - 1); });
+		return std::accumulate(values.cbegin(), values.cend(), INT_MAX, [](int min, int current)
+							   { return ((min < current) ? min : current); });
+	}
 }
 
 void Game::updateScoreOfSquare(int x, int y, Player player)
@@ -380,11 +483,53 @@ bool Game::placePiece(int x, int y)
 		currentPlayer = ((currentPlayer == X) ? O : X);
 
 		evaluateBoard();
-		
+
 		return true;
 	}
 	else
 		return false;
+}
+
+bool Game::autoMove()
+{
+	// Make a very fast opening move
+	if (occupiedSquares.size() == 0)
+	{
+		return placePiece(Board::SideLen / 2, Board::SideLen / 2);
+	}
+	else if (occupiedSquares.size() == 1)
+	{
+		if (!placePiece(Board::SideLen / 2, Board::SideLen / 2))
+			while (!placePiece(Board::SideLen / 2 + rand() % 3 - 1, Board::SideLen / 2 + rand() % 3 - 1));
+		return true;
+	}
+	else
+	{
+		int maxScore = INT_MIN;
+		int bestX = 0, bestY = 0;
+
+		for (int x = 0; x < Board::SideLen; ++x)
+		{
+			for (int y = 0; y < Board::SideLen; ++y)
+			{
+				if (!board.squareOccupied(x, y))
+				{
+					Board newBoard(board);
+					newBoard.getSquare(x, y).setPlayer(currentPlayer);
+					int score = GameState(newBoard).minimax(currentPlayer, aiDepth);
+					
+					if (score > maxScore)
+					{
+						maxScore = score;
+						bestX = x;
+						bestY = y;
+					}
+				}
+			}
+		}
+
+		return placePiece(bestX, bestY);
+	}
 }
 
 void Game::undo()

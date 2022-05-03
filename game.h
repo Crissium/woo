@@ -60,6 +60,7 @@ private:
 
 public:
 	Board();
+	Board(const Board & other) : squares(other.squares) {}
 	~Board() {}
 
 	const Board &operator=(const Board &other);
@@ -67,8 +68,10 @@ public:
 	Square &getSquare(int x, int y) { return squares.at(x + y * SideLen); }
 	const Square &getSquare(int x, int y) const { return squares.at(x + y * SideLen); }
 	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
-	bool squareOccupied(int x, int y) { return (getSquare(x, y).getPlayer() != Nobody); }
+	bool squareOccupied(int x, int y) const { return (getSquare(x, y).getPlayer() != Nobody); }
 
+	inline int numSquaresOccupiedBy(Player) const;
+	inline Player getCurrentPlayer() const;
 	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
 
 	/**
@@ -104,6 +107,57 @@ public:
 	int analysisResult() const;
 };
 
+/**
+ * This class is for implementing the minimax algorithm,
+ * which can be defined as follows:
+ * 
+ * Minimax(s, p, depth) = 
+ * 		Utility(s, p) if Terminal(s) or depth = 1
+ * 		max(Minimax(Result(s, a), p, depth - 1)) for each a in Actions(s) if Player(s) = p
+ * 		min(Minimax(Result(s, a), p, depth - 1)) for each a in Actions(s) if Player(s) is not p
+ */
+class GameState
+{
+	private:
+	struct Coord
+	{
+		int x;
+		int y;
+
+		Coord(int p = 0, int q = 0): x(p), y(q) {}
+	};
+
+	Board board;
+
+	bool terminal() const {return board.gameStatus() != 'r';}
+
+	int boardAnalysisResult(Player) const;
+	
+	/** 
+	 * Takes this state and analysed player
+	 * Return infty or -infty if state is terminal,
+	 * Or return the sum of every unoccupied square's analysis result. 
+	 */
+	int utility(Player) const;
+
+	/**
+	 * Takes the current state and a particular move (Coord)
+	 * Returns the resulting state.
+	 */
+	GameState result(const Coord & move) const;
+
+	/** Returns a vector of legal moves in this state,
+	 * i.e. Unoccupied Squares
+	 */
+	std::vector<Coord> actions() const;
+
+	public:
+	GameState(const Board & b) : board(b) {}
+	~GameState() {}
+
+	int minimax(Player, int depth) const;
+};
+
 class Game
 {
 private:
@@ -119,6 +173,8 @@ private:
 	std::vector<std::array<int, 2>> xMaxLocations;
 	std::vector<std::array<int, 2>> oMaxLocations;
 
+	int aiDepth;
+
 	int getXScoreOfSquare(int x, int y) const { return xScores.at(x + y * Board::SideLen); }
 	int getXScoreOfSquare(const std::array<int, 2> &location) { return getXScoreOfSquare(location.at(0), location.at(1)); }
 	int &getXScoreOfSquare(int x, int y) { return xScores.at(x + y * Board::SideLen); }
@@ -132,10 +188,11 @@ private:
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X), xScores({0}), oScores({0}), xScoreSum(0L), oScoreSum(0L) {}
+	Game() : currentPlayer(X), xScores({0}), oScores({0}), xScoreSum(0L), oScoreSum(0L), aiDepth(4) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
+	bool autoMove();
 	void undo();
 	void restart();
 
