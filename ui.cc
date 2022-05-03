@@ -135,9 +135,9 @@ bool Woo::placePiece(sf::Vector2i position)
 void Woo::autoPlace()
 {
 	game.autoMove();
-	
+
 	auto theMove = game.getLastestMovedSquare();
-	
+
 	if (theMove.getPlayer() == X)
 		XPieces.push_back(XSprite(theMove.getX(), theMove.getY()));
 	else

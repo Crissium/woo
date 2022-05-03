@@ -500,7 +500,8 @@ bool Game::autoMove()
 	else if (occupiedSquares.size() == 1)
 	{
 		if (!placePiece(Board::SideLen / 2, Board::SideLen / 2))
-			while (!placePiece(Board::SideLen / 2 + rand() % 3 - 1, Board::SideLen / 2 + rand() % 3 - 1));
+			while (!placePiece(Board::SideLen / 2 + rand() % 3 - 1, Board::SideLen / 2 + rand() % 3 - 1))
+				;
 		return true;
 	}
 	else
@@ -517,7 +518,7 @@ bool Game::autoMove()
 					Board newBoard(board);
 					newBoard.getSquare(x, y).setPlayer(currentPlayer);
 					int score = GameState(newBoard).minimax(currentPlayer, aiDepth);
-					
+
 					if (score > maxScore)
 					{
 						maxScore = score;

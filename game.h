@@ -60,7 +60,7 @@ private:
 
 public:
 	Board();
-	Board(const Board & other) : squares(other.squares) {}
+	Board(const Board &other) : squares(other.squares) {}
 	~Board() {}
 
 	const Board &operator=(const Board &other);
@@ -110,33 +110,33 @@ public:
 /**
  * This class is for implementing the minimax algorithm,
  * which can be defined as follows:
- * 
- * Minimax(s, p, depth) = 
+ *
+ * Minimax(s, p, depth) =
  * 		Utility(s, p) if Terminal(s) or depth = 1
  * 		max(Minimax(Result(s, a), p, depth - 1)) for each a in Actions(s) if Player(s) = p
  * 		min(Minimax(Result(s, a), p, depth - 1)) for each a in Actions(s) if Player(s) is not p
  */
 class GameState
 {
-	private:
+private:
 	struct Coord
 	{
 		int x;
 		int y;
 
-		Coord(int p = 0, int q = 0): x(p), y(q) {}
+		Coord(int p = 0, int q = 0) : x(p), y(q) {}
 	};
 
 	Board board;
 
-	bool terminal() const {return board.gameStatus() != 'r';}
+	bool terminal() const { return board.gameStatus() != 'r'; }
 
 	int boardAnalysisResult(Player) const;
-	
-	/** 
+
+	/**
 	 * Takes this state and analysed player
 	 * Return infty or -infty if state is terminal,
-	 * Or return the sum of every unoccupied square's analysis result. 
+	 * Or return the sum of every unoccupied square's analysis result.
 	 */
 	int utility(Player) const;
 
@@ -144,15 +144,15 @@ class GameState
 	 * Takes the current state and a particular move (Coord)
 	 * Returns the resulting state.
 	 */
-	GameState result(const Coord & move) const;
+	GameState result(const Coord &move) const;
 
 	/** Returns a vector of legal moves in this state,
 	 * i.e. Unoccupied Squares
 	 */
 	std::vector<Coord> actions() const;
 
-	public:
-	GameState(const Board & b) : board(b) {}
+public:
+	GameState(const Board &b) : board(b) {}
 	~GameState() {}
 
 	int minimax(Player, int depth) const;
@@ -207,7 +207,7 @@ public:
 	/** Please note that for some mysterious reason, x and y are reversed! */
 	void printScores() const;
 
-	const Square & getLastestMovedSquare() const {return *occupiedSquares.crbegin();}
+	const Square &getLastestMovedSquare() const { return *occupiedSquares.crbegin(); }
 	const std::vector<Square> &getPlacedPiecesList() const { return occupiedSquares; }
 };
 
