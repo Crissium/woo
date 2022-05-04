@@ -147,8 +147,7 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 
 int Board::numSquaresOccupiedBy(Player player) const
 {
-	return std::accumulate(squares.cbegin(), squares.cend(), 0, [player](int previousSum, const Square &s)
-						   { return ((s.getPlayer() == player) ? (previousSum + 1) : previousSum); });
+	return std::count_if(squares.cbegin(), squares.cend(), [player] (const Square & s) {return s.getPlayer() == player;});
 }
 
 Player Board::getCurrentPlayer() const
@@ -337,8 +336,7 @@ int GameState::minimax(Player player, int depth) const
 		std::vector<int> values;
 		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
 					   { return result(move).minimax(player, depth - 1); });
-		return std::accumulate(values.cbegin(), values.cend(), INT_MIN, [](int max, int current)
-							   { return ((max > current) ? max : current); });
+		return *std::max_element(values.cbegin(), values.cend());
 	}
 	else
 	{
@@ -346,8 +344,7 @@ int GameState::minimax(Player player, int depth) const
 		std::vector<int> values;
 		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
 					   { return result(move).minimax(player, depth - 1); });
-		return std::accumulate(values.cbegin(), values.cend(), INT_MAX, [](int min, int current)
-							   { return ((min < current) ? min : current); });
+		return *std::min_element(values.cbegin(), values.cend());
 	}
 }
 
@@ -482,8 +479,6 @@ bool Game::placePiece(int x, int y)
 
 		currentPlayer = ((currentPlayer == X) ? O : X);
 
-		evaluateBoard();
-
 		return true;
 	}
 	else
@@ -540,8 +535,6 @@ void Game::undo()
 
 	board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
 	occupiedSquares.pop_back();
-
-	evaluateBoard();
 }
 
 void Game::restart()
@@ -549,6 +542,4 @@ void Game::restart()
 	board.clear();
 	occupiedSquares.clear();
 	currentPlayer = X;
-
-	evaluateBoard();
 }
