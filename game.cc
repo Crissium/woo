@@ -3,6 +3,9 @@
 #include <numeric>
 #include <fstream>
 #include <climits>
+#include <cassert>
+#include <ctime>
+#include <iostream>
 
 const Square &Square::operator=(const Square &other)
 {
@@ -147,7 +150,8 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 
 int Board::numSquaresOccupiedBy(Player player) const
 {
-	return std::count_if(squares.cbegin(), squares.cend(), [player] (const Square & s) {return s.getPlayer() == player;});
+	return std::count_if(squares.cbegin(), squares.cend(), [player](const Square &s)
+						 { return s.getPlayer() == player; });
 }
 
 Player Board::getCurrentPlayer() const
@@ -316,7 +320,7 @@ std::vector<GameState::Coord> GameState::actions() const
 	{
 		for (int y = 0; y < Board::SideLen; ++y)
 		{
-			if (board.squareOccupied(x, y))
+			if (!board.squareOccupied(x, y))
 				moves.push_back(Coord(x, y));
 		}
 	}
@@ -330,21 +334,16 @@ int GameState::minimax(Player player, int depth) const
 	{
 		return utility(player);
 	}
-	else if (board.getCurrentPlayer() == player)
-	{
-		auto moves = actions();
-		std::vector<int> values;
-		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
-					   { return result(move).minimax(player, depth - 1); });
-		return *std::max_element(values.cbegin(), values.cend());
-	}
 	else
 	{
 		auto moves = actions();
 		std::vector<int> values;
 		std::transform(moves.cbegin(), moves.cend(), std::back_inserter(values), [this, player, depth](const Coord &move)
 					   { return result(move).minimax(player, depth - 1); });
-		return *std::min_element(values.cbegin(), values.cend());
+		if (board.getCurrentPlayer() == player)
+			return *std::max_element(values.cbegin(), values.cend());
+		else
+			return *std::min_element(values.cbegin(), values.cend());
 	}
 }
 
@@ -504,6 +503,8 @@ bool Game::autoMove()
 		int maxScore = INT_MIN;
 		int bestX = 0, bestY = 0;
 
+		time_t startTime = time(nullptr);
+
 		for (int x = 0; x < Board::SideLen; ++x)
 		{
 			for (int y = 0; y < Board::SideLen; ++y)
@@ -523,6 +524,8 @@ bool Game::autoMove()
 				}
 			}
 		}
+
+		std::cout << "Analysis took " << time(nullptr) - startTime << " second(s).\n";
 
 		return placePiece(bestX, bestY);
 	}
