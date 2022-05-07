@@ -154,6 +154,19 @@ int Board::numSquaresOccupiedBy(Player player) const
 						 { return s.getPlayer() == player; });
 }
 
+bool Board::hasOccupiedSquaresNearby(int x, int y) const
+{
+	for (size_t direction = 0; direction < 4; ++direction)
+	{
+		for (int distance = 1; distance <= 2 /* magic number here! */; ++distance)
+		{
+			if (coordValid(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance) && squareOccupied(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance))
+				return true;
+		}
+	}
+	return false;
+}
+
 Player Board::getCurrentPlayer() const
 {
 	return ((numSquaresOccupiedBy(X) > numSquaresOccupiedBy(O)) ? O : X);
@@ -320,12 +333,46 @@ std::vector<GameState::Coord> GameState::actions() const
 	{
 		for (int y = 0; y < Board::SideLen; ++y)
 		{
-			if (!board.squareOccupied(x, y))
+			if (!board.squareOccupied(x, y) && board.hasOccupiedSquaresNearby(x, y))
 				moves.push_back(Coord(x, y));
 		}
 	}
 
 	return moves;
+}
+
+int GameState::maxValue(int alpha, int beta, Player player, int depth) const
+{
+	if (depth == 1 || terminal())
+		return utility(player);
+	
+	int v = INT_MIN;
+	
+	for (auto const & a : actions())
+	{
+		v = std::max(v, result(a).minValue(alpha, beta, player, depth - 1));
+		if (v >= beta)
+			return v;
+		alpha = std::max(alpha, v);
+	}
+	return v;
+}
+
+int GameState::minValue(int alpha, int beta, Player player, int depth) const
+{
+	if (depth == 1 || terminal())
+		return utility(player);
+	
+	int v = INT_MAX;
+
+	for (auto const & a : actions())
+	{
+		v = std::min(v, result(a).maxValue(alpha, beta, player, depth - 1));
+		if (v <= alpha)
+			return v;
+		beta = std::min(beta, v);
+	}
+	return v;
 }
 
 int GameState::minimax(Player player, int depth) const
@@ -345,6 +392,11 @@ int GameState::minimax(Player player, int depth) const
 		else
 			return *std::min_element(values.cbegin(), values.cend());
 	}
+}
+
+int GameState::alphaBetaSearch(Player player, int depth) const
+{
+	return maxValue(INT_MIN, INT_MAX, player, depth);
 }
 
 void Game::updateScoreOfSquare(int x, int y, Player player)
@@ -509,11 +561,11 @@ bool Game::autoMove()
 		{
 			for (int y = 0; y < Board::SideLen; ++y)
 			{
-				if (!board.squareOccupied(x, y))
+				if (!board.squareOccupied(x, y) && board.hasOccupiedSquaresNearby(x, y))
 				{
 					Board newBoard(board);
 					newBoard.getSquare(x, y).setPlayer(currentPlayer);
-					int score = GameState(newBoard).minimax(currentPlayer, aiDepth);
+					int score = GameState(newBoard).alphaBetaSearch(currentPlayer, aiDepth);
 
 					if (score > maxScore)
 					{

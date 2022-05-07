@@ -73,6 +73,7 @@ public:
 	inline int numSquaresOccupiedBy(Player) const;
 	inline Player getCurrentPlayer() const;
 	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
+	bool hasOccupiedSquaresNearby(int x, int y) const;
 
 	/**
 	 * Return 'r' if game is not over and still Running;
@@ -118,7 +119,7 @@ public:
  */
 class GameState
 {
-private:
+public:
 	struct Coord
 	{
 		int x;
@@ -127,6 +128,7 @@ private:
 		Coord(int p = 0, int q = 0) : x(p), y(q) {}
 	};
 
+private:
 	Board board;
 
 	bool terminal() const { return board.gameStatus() != 'r'; }
@@ -148,14 +150,25 @@ private:
 
 	/** Returns a vector of legal moves in this state,
 	 * i.e. Unoccupied Squares
+	 * 
+	 * I am going to optimise this method
+	 * by only returning those coordinates with occupied squares nearby,
+	 * that is, if an unoccupied square does not have a piece within two squares
+	 * in all four directions, then this would not be included in the returned vector.
+	 * This calls for a helper function.
 	 */
 	std::vector<Coord> actions() const;
+
+	// These two below are for alpha-beta pruning
+	int maxValue(int alpha, int beta, Player, int depth) const;
+	int minValue(int alpla, int beta, Player, int depth) const;
 
 public:
 	GameState(const Board &b) : board(b) {}
 	~GameState() {}
 
 	int minimax(Player, int depth) const;
+	inline int alphaBetaSearch(Player, int depth) const;
 };
 
 class Game
@@ -188,7 +201,7 @@ private:
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X), xScores({0}), oScores({0}), xScoreSum(0L), oScoreSum(0L), aiDepth(6) {}
+	Game() : currentPlayer(X), xScores({0}), oScores({0}), xScoreSum(0L), oScoreSum(0L), aiDepth(3) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
