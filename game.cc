@@ -3,7 +3,6 @@
 #include <numeric>
 #include <fstream>
 #include <climits>
-#include <cassert>
 #include <ctime>
 #include <iostream>
 
@@ -43,16 +42,7 @@ const Board &Board::operator=(const Board &other)
 
 bool Board::draw() const
 {
-	for (int x = 0; x < SideLen; ++x)
-	{
-		for (int y = 0; y < SideLen; ++y)
-		{
-			if (getSquare(x, y).getPlayer() == Nobody)
-				return false;
-		}
-	}
-
-	return true;
+	return (numSquaresOccupiedBy(Nobody) == 0);
 }
 
 char Board::gameStatus() const
@@ -160,7 +150,7 @@ bool Board::hasOccupiedSquaresNearby(int x, int y) const
 	{
 		for (int distance = 1; distance <= 2 /* magic number here! */; ++distance)
 		{
-			if (coordValid(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance) && squareOccupied(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance))
+			if ((coordValid(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance) && squareOccupied(x + Directions[direction][0] * distance, y + Directions[direction][1] * distance)) || (coordValid(x - Directions[direction][0] * distance, y - Directions[direction][1] * distance) && squareOccupied(x - Directions[direction][0] * distance, y - Directions[direction][1] * distance)))
 				return true;
 		}
 	}
@@ -397,128 +387,6 @@ int GameState::minimax(Player player, int depth) const
 int GameState::alphaBetaSearch(Player player, int depth) const
 {
 	return maxValue(INT_MIN, INT_MAX, player, depth);
-}
-
-void Game::updateScoreOfSquare(int x, int y, Player player)
-{
-	if (board.squareOccupied(x, y))
-	{
-		getXScoreOfSquare(x, y) = 0;
-		getOScoreOfSquare(x, y) = 0;
-	}
-
-	else
-	{
-		if (player == X)
-		{
-			getXScoreOfSquare(x, y) = BoardAnalyser(board, x, y, X).analysisResult();
-		}
-		else
-		{
-			getOScoreOfSquare(x, y) = BoardAnalyser(board, x, y, O).analysisResult();
-		}
-	}
-}
-
-void Game::evaluateBoard()
-{
-	for (int x = 0; x < Board::SideLen; ++x)
-	{
-		for (int y = 0; y < Board::SideLen; ++y)
-		{
-			updateScoreOfSquare(x, y, X);
-			updateScoreOfSquare(x, y, O);
-		}
-	}
-
-	xScoreSum = std::accumulate(xScores.cbegin(), xScores.cend(), 0L, [](long previousSum, int i)
-								{ return previousSum + i; });
-	oScoreSum = std::accumulate(oScores.cbegin(), oScores.cend(), 0L, [](long previousSum, int i)
-								{ return previousSum + i; });
-
-	xMaxLocations.clear();
-	xMaxLocations.push_back({0, 0});
-	for (int x = 0; x < Board::SideLen; ++x)
-	{
-		for (int y = 0; y < Board::SideLen; ++y)
-		{
-			if (getXScoreOfSquare(x, y) > getXScoreOfSquare(xMaxLocations.at(0)))
-			{
-				xMaxLocations.clear();
-				xMaxLocations.push_back({x, y});
-			}
-			else if (getXScoreOfSquare(x, y) == getXScoreOfSquare(xMaxLocations.at(0)))
-			{
-				xMaxLocations.push_back({x, y});
-			}
-		}
-	}
-
-	oMaxLocations.clear();
-	oMaxLocations.push_back({0, 0});
-	for (int x = 0; x < Board::SideLen; ++x)
-	{
-		for (int y = 0; y < Board::SideLen; ++y)
-		{
-			if (getOScoreOfSquare(x, y) > getOScoreOfSquare(oMaxLocations.at(0)))
-			{
-				oMaxLocations.clear();
-				oMaxLocations.push_back({x, y});
-			}
-			else if (getOScoreOfSquare(x, y) == getOScoreOfSquare(oMaxLocations.at(0)))
-			{
-				oMaxLocations.push_back({x, y});
-			}
-		}
-	}
-
-	printScores();
-}
-
-void Game::printScores() const
-{
-	/** \FIXME Please note that for some mysterious reason, x and y are reversed! */
-	std::ofstream fout("XScores.txt");
-
-	fout << "X Score Table\n"
-		 << "Score sum = " << xScoreSum << '\n'
-		 << "Maximum score location(s): ";
-	for (auto const &location : xMaxLocations)
-	{
-		fout << '(' << location.at(1) + 1 << ", " << location.at(0) + 1 << ") ";
-	}
-	fout << '\n'
-		 << '\n';
-
-	for (int y = 0; y < Board::SideLen; ++y)
-	{
-		for (int x = 0; x < Board::SideLen; ++x)
-		{
-			fout << getXScoreOfSquare(x, y) << " \n"[x == Board::SideLen - 1];
-		}
-	}
-
-	fout.close();
-
-	fout.open("OScores.txt");
-	fout << "O Score Table\n"
-		 << "Score sum = " << oScoreSum << '\n'
-		 << "Maximum score location(s): ";
-	for (auto const &location : oMaxLocations)
-	{
-		fout << '(' << location.at(1) + 1 << ", " << location.at(0) + 1 << ") ";
-	}
-	fout << '\n'
-		 << '\n';
-
-	for (int y = 0; y < Board::SideLen; ++y)
-	{
-		for (int x = 0; x < Board::SideLen; ++x)
-		{
-			fout << getOScoreOfSquare(x, y) << " \n"[x == Board::SideLen - 1];
-		}
-	}
-	fout.close();
 }
 
 bool Game::placePiece(int x, int y)
