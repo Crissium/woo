@@ -136,7 +136,7 @@ void Woo::autoPlace()
 {
 	game.autoMove();
 
-	auto theMove = game.getLastestMovedSquare();
+	auto &theMove = game.getLastestMovedSquare();
 
 	if (theMove.getPlayer() == X)
 		XPieces.push_back(XSprite(theMove.getX(), theMove.getY()));

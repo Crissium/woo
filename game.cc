@@ -436,7 +436,7 @@ bool Game::autoMove()
 				{
 					Board newBoard(board);
 					newBoard.getSquare(x, y).setPlayer(currentPlayer);
-					int score = GameState(newBoard).alphaBetaAnalysis(currentPlayer, (occupiedSquares.size() <= 10) ? 3 : aiDepth);
+					int score = GameState(newBoard).alphaBetaAnalysis(currentPlayer, (occupiedSquares.size() <= 10) ? 1 : aiDepth);
 
 					if (score > maxScore)
 					{
