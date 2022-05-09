@@ -168,7 +168,7 @@ public:
 	~GameState() {}
 
 	int minimax(Player, int depth) const;
-	inline int alphaBetaSearch(Player, int depth) const;
+	int alphaBetaAnalysis(Player, int depth) const;
 };
 
 class Game
@@ -184,7 +184,7 @@ private:
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X), aiDepth(1) {}
+	Game() : currentPlayer(X), aiDepth(3) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }

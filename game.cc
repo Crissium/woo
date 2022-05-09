@@ -335,10 +335,10 @@ int GameState::maxValue(int alpha, int beta, Player player, int depth) const
 {
 	if (depth == 1 || terminal())
 		return utility(player);
-	
+
 	int v = INT_MIN;
-	
-	for (auto const & a : actions())
+
+	for (auto const &a : actions())
 	{
 		v = std::max(v, result(a).minValue(alpha, beta, player, depth - 1));
 		if (v >= beta)
@@ -352,10 +352,10 @@ int GameState::minValue(int alpha, int beta, Player player, int depth) const
 {
 	if (depth == 1 || terminal())
 		return utility(player);
-	
+
 	int v = INT_MAX;
 
-	for (auto const & a : actions())
+	for (auto const &a : actions())
 	{
 		v = std::min(v, result(a).maxValue(alpha, beta, player, depth - 1));
 		if (v <= alpha)
@@ -384,9 +384,12 @@ int GameState::minimax(Player player, int depth) const
 	}
 }
 
-int GameState::alphaBetaSearch(Player player, int depth) const
+int GameState::alphaBetaAnalysis(Player player, int depth) const
 {
-	return maxValue(INT_MIN, INT_MAX, player, depth);
+	if (board.getCurrentPlayer() == player)
+		return maxValue(INT_MIN, INT_MAX, player, depth);
+	else
+		return minValue(INT_MIN, INT_MAX, player, depth);
 }
 
 bool Game::placePiece(int x, int y)
@@ -433,7 +436,7 @@ bool Game::autoMove()
 				{
 					Board newBoard(board);
 					newBoard.getSquare(x, y).setPlayer(currentPlayer);
-					int score = GameState(newBoard).alphaBetaSearch(currentPlayer, aiDepth);
+					int score = GameState(newBoard).alphaBetaAnalysis(currentPlayer, (occupiedSquares.size() <= 10) ? 3 : aiDepth);
 
 					if (score > maxScore)
 					{
