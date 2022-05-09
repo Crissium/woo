@@ -61,6 +61,7 @@ private:
 public:
 	Board();
 	Board(const Board &other) : squares(other.squares) {}
+	inline Board(const Board & other, int moveX, int moveY);
 	~Board() {}
 
 	const Board &operator=(const Board &other);
@@ -89,7 +90,7 @@ public:
 	void clear();
 };
 
-class BoardAnalyser
+class MoveAnalyser
 {
 private:
 	Player evaluatedPlayer;
@@ -102,8 +103,17 @@ private:
 	int getScoreOfStrip(const PieceStrip &) const;
 
 public:
-	BoardAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
-	~BoardAnalyser() {}
+	/**
+	 * For an unoccupied square analysis
+	 */
+	MoveAnalyser(const Board &analysedBoard, int x, int y);
+
+	/**
+	 * For analysing an occupied square
+	 */
+	inline MoveAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
+
+	~MoveAnalyser() {}
 
 	int analysisResult() const;
 };
@@ -135,18 +145,13 @@ private:
 
 	int boardAnalysisResult(Player) const;
 
-	/**
-	 * Takes this state and analysed player
-	 * Return infty or -infty if state is terminal,
-	 * Or return the sum of every unoccupied square's analysis result.
-	 */
 	int utility(Player) const;
 
 	/**
 	 * Takes the current state and a particular move (Coord)
 	 * Returns the resulting state.
 	 */
-	GameState result(const Coord &move) const;
+	inline GameState result(const Coord &move) const;
 
 	/** Returns a vector of legal moves in this state,
 	 * i.e. Unoccupied Squares
@@ -165,10 +170,40 @@ private:
 
 public:
 	GameState(const Board &b) : board(b) {}
+	GameState(const Board & b, int moveX, int moveY);
 	~GameState() {}
 
 	int minimax(Player, int depth) const;
 	int alphaBetaAnalysis(Player, int depth) const;
+};
+
+struct Coord
+{
+	int x;
+	int y;
+
+	Coord(int p = 0, int q = 0) : x(p), y(q) {}
+};
+
+/**
+ * The above-defined GameState class has inherent (designing)
+ * defects, so I re-implemented the idea with a move-based analyser
+ */
+class GameAnalyser
+{
+	Board board;
+	Coord move;
+
+	/**
+	 * Return if the analysed move terminates this game
+	 */
+	inline bool terminal() const;
+
+	/**
+	 * Return the score of the specified move
+	 */
+	inline int utility() const;
+
 };
 
 class Game

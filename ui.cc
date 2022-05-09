@@ -134,7 +134,8 @@ bool Woo::placePiece(sf::Vector2i position)
 
 void Woo::autoPlace()
 {
-	game.autoMove();
+	if(!game.autoMove())
+		abort();
 
 	auto &theMove = game.getLastestMovedSquare();
 
