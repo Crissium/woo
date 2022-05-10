@@ -181,35 +181,6 @@ public:
 	int alphaBetaAnalysis(Player, int depth) const;
 };
 
-struct Coord
-{
-	int x;
-	int y;
-
-	Coord(int p = 0, int q = 0) : x(p), y(q) {}
-};
-
-/**
- * The above-defined GameState class has inherent (designing)
- * defects, so I re-implemented the idea with a move-based analyser
- */
-class GameAnalyser
-{
-	Board board;
-	Coord move;
-
-	/**
-	 * Return if the analysed move terminates this game
-	 */
-	inline bool terminal() const;
-
-	/**
-	 * Return the score of the specified move
-	 */
-	inline int utility() const;
-
-};
-
 class Game
 {
 private:

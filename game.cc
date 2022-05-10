@@ -366,16 +366,6 @@ int GameState::alphaBetaAnalysis(Player player, int depth) const
 		return minValue(INT_MIN, INT_MAX, player, depth);
 }
 
-bool GameAnalyser::terminal() const
-{
-	return (Board(board, move.x, move.y).gameStatus() != 'r');
-}
-
-int GameAnalyser::utility() const
-{
-	return MoveAnalyser(board, move.x, move.y, board.getCurrentPlayer()).analysisResult();
-}
-
 bool Game::placePiece(int x, int y)
 {
 	if (board.coordValid(x, y) && !board.squareOccupied(x, y))
