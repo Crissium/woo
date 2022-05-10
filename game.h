@@ -212,7 +212,6 @@ public:
 	char gameStatus() const { return board.gameStatus(); }
 
 	const Square &getLastestMovedSquare() const { return *occupiedSquares.crbegin(); }
-	const std::vector<Square> &getPlacedPiecesList() const { return occupiedSquares; }
 };
 
 #endif
