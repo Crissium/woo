@@ -206,6 +206,24 @@ void Woo::processEvents()
 				case sf::Keyboard::A:
 					autoPlace();
 					break;
+				case sf::Keyboard::Num1:
+					game.setDepth(1);
+					break;
+				case sf::Keyboard::Num2:
+					game.setDepth(2);
+					break;
+				case sf::Keyboard::Num3:
+					game.setDepth(3);
+					break;
+				case sf::Keyboard::Num4:
+					game.setDepth(4);
+					break;
+				case sf::Keyboard::Num5:
+					game.setDepth(5);
+					break;
+				case sf::Keyboard::Num6:
+					game.setDepth(6);
+					break;
 				default:
 					break;
 				}

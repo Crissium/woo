@@ -195,13 +195,15 @@ private:
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X), aiDepth(1) {}
+	Game() : currentPlayer(X), aiDepth(4) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
 	bool autoMove();
 	void undo();
 	void restart();
+
+	void setDepth(int depth) {aiDepth = depth;}
 
 	/**
 	 * Return 'r' if game is not over and still Running;
