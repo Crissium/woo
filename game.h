@@ -112,12 +112,12 @@ public:
 	/**
 	 * This constructor does not modify the square's occupant
 	 */
-	MoveAnalyser(const Board &analysedBoard, int x, int y);
+	inline MoveAnalyser(const Board &analysedBoard, int x, int y);
 
 	/**
 	 * This constructor 'changes' the square's occupant
 	 */
-	inline MoveAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
+	MoveAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
 
 	~MoveAnalyser() {}
 
