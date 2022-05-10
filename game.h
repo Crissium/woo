@@ -135,7 +135,7 @@ public:
  */
 class GameState
 {
-public:
+private:
 	struct Coord
 	{
 		int x;
@@ -144,7 +144,6 @@ public:
 		Coord(int p = 0, int q = 0) : x(p), y(q) {}
 	};
 
-private:
 	Board board;
 
 	bool terminal() const { return board.gameStatus() != 'r'; }
