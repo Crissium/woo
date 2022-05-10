@@ -18,6 +18,16 @@ const Square &Square::operator=(const Square &other)
 	return *this;
 }
 
+bool PieceStrip::hasAWinningConnection() const
+{
+	for (size_t i = 0; i < 5; ++i)
+	{
+		if ((at(i) == X || at(i) == O) && (at(i) == at(i + 1) && at(i) == at(i + 2) && at(i) == at(i + 3) && at(i) == at(i + 4)))
+			return true;
+	}
+	return false;
+}
+
 Board::Board()
 {
 	for (int x = 0; x < SideLen; ++x)
@@ -37,6 +47,7 @@ const Board &Board::operator=(const Board &other)
 		return *this;
 
 	squares = other.squares;
+	mostRecentlyModifiedSquare = &getSquare(other.mostRecentlyModifiedSquare->getX(), other.mostRecentlyModifiedSquare->getY());
 	return *this;
 }
 
@@ -47,72 +58,21 @@ bool Board::draw() const
 
 char Board::gameStatus() const
 {
-	Player player = Nobody;
-
-	// -
-	for (int x = 0; x < SideLen; ++x)
-	{
-		for (int y = 0; y < SideLen - 4; ++y)
-		{
-			if ((player = (getSquare(x, y)).getPlayer()) != Nobody && player == getSquare(x, y + 1).getPlayer() && player == getSquare(x, y + 2).getPlayer() && player == getSquare(x, y + 3).getPlayer() && player == getSquare(x, y + 4).getPlayer())
-			{
-				if (player == X)
-					return 'x';
-				else
-					return 'o';
-			}
-		}
-	}
-
-	// |
-	for (int y = 0; y < SideLen; ++y)
-	{
-		for (int x = 0; x < SideLen - 4; ++x)
-		{
-			if ((player = (getSquare(x, y)).getPlayer()) != Nobody && player == getSquare(x + 1, y).getPlayer() && player == getSquare(x + 2, y).getPlayer() && player == getSquare(x + 3, y).getPlayer() && player == getSquare(x + 4, y).getPlayer())
-			{
-				if (player == X)
-					return 'x';
-				else
-					return 'o';
-			}
-		}
-	}
-
-	// '\'
-	for (int x = 0; x < SideLen - 4; ++x)
-	{
-		for (int y = 0; y < SideLen - 4; ++y)
-		{
-			if ((player = (getSquare(x, y)).getPlayer()) != Nobody && player == getSquare(x + 1, y + 1).getPlayer() && player == getSquare(x + 2, y + 2).getPlayer() && player == getSquare(x + 3, y + 3).getPlayer() && player == getSquare(x + 4, y + 4).getPlayer())
-			{
-				if (player == X)
-					return 'x';
-				else
-					return 'o';
-			}
-		}
-	}
-
-	// /
-	for (int x = 0; x < SideLen - 4; ++x)
-	{
-		for (int y = SideLen - 1; y > 3; --y)
-		{
-			if ((player = (getSquare(x, y)).getPlayer()) != Nobody && player == getSquare(x + 1, y - 1).getPlayer() && player == getSquare(x + 2, y - 2).getPlayer() && player == getSquare(x + 3, y - 3).getPlayer() && player == getSquare(x + 4, y - 4).getPlayer())
-			{
-				if (player == X)
-					return 'x';
-				else
-					return 'o';
-			}
-		}
-	}
-
 	if (draw())
 		return 'd';
-	else
-		return 'r';
+
+	for (auto const & s : getSurroundingPieces(mostRecentlyModifiedSquare->getX(), mostRecentlyModifiedSquare->getY()))
+	{
+		if (s.hasAWinningConnection())
+		{
+			if (getCurrentPlayer() == X) // if the previous turn was O's
+				return 'o';
+			else
+				return 'x';
+		}
+	}
+
+	return 'r';
 }
 
 std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
@@ -142,8 +102,9 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 
 Board::Board(const Board &other, int moveX, int moveY) : squares(other.squares) 
 { 
-	getSquare(moveX, moveY).setPlayer(getCurrentPlayer()); 
-	}
+	getSquare(moveX, moveY).setPlayer(getCurrentPlayer());
+	mostRecentlyModifiedSquare = &getSquare(moveX, moveY);
+}
 
 int Board::numSquaresOccupiedBy(Player player) const
 {
@@ -278,9 +239,8 @@ int MoveAnalyser::analysisResult() const
 						   { return previousScoreSum + getScoreOfStrip(s); });
 }
 
-GameState::GameState(const Board & b, int moveX, int moveY) : board(b)
+GameState::GameState(const Board & b, int moveX, int moveY) : board(b, moveX, moveY)
 {
-	board.getSquare(moveX,moveY).setPlayer(board.getCurrentPlayer());
 }
 
 int GameState::boardAnalysisResult(Player player) const
@@ -416,6 +376,7 @@ bool Game::placePiece(int x, int y)
 	if (board.coordValid(x, y) && !board.squareOccupied(x, y))
 	{
 		board.getSquare(x, y).setPlayer(currentPlayer);
+		board.mostRecentlyModifiedSquare = &board.getSquare(x, y);
 		occupiedSquares.push_back(board.getSquare(x, y));
 
 		currentPlayer = ((currentPlayer == X) ? O : X);
@@ -478,6 +439,8 @@ void Game::undo()
 
 	board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
 	occupiedSquares.pop_back();
+
+	board.mostRecentlyModifiedSquare = &board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY());
 }
 
 void Game::restart()

@@ -41,6 +41,7 @@ public:
 	PieceStrip() {}
 	~PieceStrip() {}
 	void setPlayer(size_t index, Player player) { at(index) = player; }
+	bool hasAWinningConnection() const;
 };
 
 class Board
@@ -53,14 +54,16 @@ public:
 
 private:
 	std::array<Square, SideLen * SideLen> squares;
-
+	public:
+	Square * mostRecentlyModifiedSquare;
+private:
 	static const int Directions[4][2];
 
 	inline bool draw() const;
 
 public:
 	Board();
-	Board(const Board &other) : squares(other.squares) {}
+	Board(const Board &other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr) {}
 	inline Board(const Board & other, int moveX, int moveY);
 	~Board() {}
 
