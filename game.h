@@ -54,8 +54,10 @@ public:
 
 private:
 	std::array<Square, SideLen * SideLen> squares;
-	public:
-	Square * mostRecentlyModifiedSquare;
+
+public:
+	Square *mostRecentlyModifiedSquare;
+
 private:
 	static const int Directions[4][2];
 
@@ -64,7 +66,7 @@ private:
 public:
 	Board();
 	Board(const Board &other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr) {}
-	inline Board(const Board & other, int moveX, int moveY);
+	inline Board(const Board &other, int moveX, int moveY);
 	~Board() {}
 
 	const Board &operator=(const Board &other);
@@ -174,7 +176,7 @@ private:
 
 public:
 	GameState(const Board &b) : board(b) {}
-	GameState(const Board & b, int moveX, int moveY);
+	GameState(const Board &b, int moveX, int moveY);
 	~GameState() {}
 
 	int minimax(Player, int depth) const;

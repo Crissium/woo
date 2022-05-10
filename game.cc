@@ -61,7 +61,7 @@ char Board::gameStatus() const
 	if (draw())
 		return 'd';
 
-	for (auto const & s : getSurroundingPieces(mostRecentlyModifiedSquare->getX(), mostRecentlyModifiedSquare->getY()))
+	for (auto const &s : getSurroundingPieces(mostRecentlyModifiedSquare->getX(), mostRecentlyModifiedSquare->getY()))
 	{
 		if (s.hasAWinningConnection())
 		{
@@ -81,7 +81,7 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 
 	for (size_t direction = 0; direction < 4; ++direction)
 	{
-		surroundings.at(direction).setPlayer(4, getSquare(x,y).getPlayer());
+		surroundings.at(direction).setPlayer(4, getSquare(x, y).getPlayer());
 
 		for (int distance = 4; distance > 0; --distance)
 		{
@@ -100,8 +100,8 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	return surroundings;
 }
 
-Board::Board(const Board &other, int moveX, int moveY) : squares(other.squares) 
-{ 
+Board::Board(const Board &other, int moveX, int moveY) : squares(other.squares)
+{
 	getSquare(moveX, moveY).setPlayer(getCurrentPlayer());
 	mostRecentlyModifiedSquare = &getSquare(moveX, moveY);
 }
@@ -228,11 +228,11 @@ int MoveAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 	return score;
 }
 
-MoveAnalyser::MoveAnalyser(const Board &analysedBoard, int x, int y) : evaluatedPlayer(analysedBoard.getSquare(x,y).getPlayer()), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
+MoveAnalyser::MoveAnalyser(const Board &analysedBoard, int x, int y) : evaluatedPlayer(analysedBoard.getSquare(x, y).getPlayer()), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
 {
 }
 
-MoveAnalyser::MoveAnalyser(const Board & analysedBoard, int x, int y, Player analysedPlayer) : evaluatedPlayer(analysedPlayer), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
+MoveAnalyser::MoveAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer) : evaluatedPlayer(analysedPlayer), analysedStrips(analysedBoard.getSurroundingPieces(x, y))
 {
 	for (auto &strip : analysedStrips)
 	{
@@ -246,7 +246,7 @@ int MoveAnalyser::analysisResult() const
 						   { return previousScoreSum + getScoreOfStrip(s); });
 }
 
-GameState::GameState(const Board & b, int moveX, int moveY) : board(b, moveX, moveY)
+GameState::GameState(const Board &b, int moveX, int moveY) : board(b, moveX, moveY)
 {
 }
 
@@ -256,7 +256,7 @@ int GameState::lastMoveAnalysisResult(Player player) const
 	Player lastMover = ((currentPlayer == X) ? O : X);
 
 	int score = MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY()).analysisResult(); // For the last mover, how brilliant the move was!
-	
+
 	score += MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY(), currentPlayer).analysisResult(); // From the last mover's point of view, if the adversary ever moved here, how terrible that would be! So it was lucky of me to block his wicked move.
 
 	if (player == lastMover)
@@ -411,7 +411,7 @@ bool Game::autoMove()
 				{
 					if (board.terminatingMove(x, y))
 						return placePiece(x, y);
-					
+
 					int score = GameState(board, x, y).alphaBetaAnalysis(currentPlayer, aiDepth);
 					std::cout << '(' << y << ',' << x << ')' << ':' << score << '\n';
 					if (score > maxScore)
@@ -424,7 +424,8 @@ bool Game::autoMove()
 			}
 		}
 
-		std::cout << "Analysis took " << time(nullptr) - startTime << " second(s).\n" << std::endl;
+		std::cout << "Analysis took " << time(nullptr) - startTime << " second(s).\n"
+				  << std::endl;
 
 		return placePiece(bestX, bestY);
 	}
