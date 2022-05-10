@@ -108,12 +108,12 @@ private:
 
 public:
 	/**
-	 * For an unoccupied square analysis
+	 * This constructor does not modify the square's occupant
 	 */
 	MoveAnalyser(const Board &analysedBoard, int x, int y);
 
 	/**
-	 * For analysing an occupied square
+	 * This constructor 'changes' the square's occupant
 	 */
 	inline MoveAnalyser(const Board &analysedBoard, int x, int y, Player analysedPlayer);
 
@@ -147,7 +147,7 @@ private:
 
 	bool terminal() const { return board.gameStatus() != 'r'; }
 
-	int boardAnalysisResult(Player) const;
+	int lastMoveAnalysisResult(Player) const;
 
 	int utility(Player) const;
 
@@ -223,7 +223,7 @@ private:
 	bool placePiece(int x, int y);
 
 public:
-	Game() : currentPlayer(X), aiDepth(3) {}
+	Game() : currentPlayer(X), aiDepth(1) {}
 
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
