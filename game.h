@@ -86,6 +86,7 @@ public:
 	 * 'd' if a draw.
 	 */
 	char gameStatus() const;
+	inline bool terminatingMove(int x, int y) const;
 
 	/**
 	 * Reset all squares to unoccupied.

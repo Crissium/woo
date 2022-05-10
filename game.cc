@@ -125,6 +125,14 @@ bool Board::hasOccupiedSquaresNearby(int x, int y) const
 	return false;
 }
 
+bool Board::terminatingMove(int x, int y) const
+{
+	if (Board(*this, x, y).gameStatus() != 'r')
+		return true;
+	else
+		return false;
+}
+
 Player Board::getCurrentPlayer() const
 {
 	return ((numSquaresOccupiedBy(X) > numSquaresOccupiedBy(O)) ? O : X);
