@@ -1,0 +1,11 @@
+# Description
+This is a crudely made Connect-5 (also known as Gomoko in Japanese) game with alpha-beta pruning.
+
+# Build
+```
+make
+```
+This game depends on SFML 2.5 and you need a C++17-compliant compiler to build (not necessarily Clang as in my Makefile).
+
+# Warning
+This is written for my C++ coursework assignment. Do not simply clone and pass it off as your own!
