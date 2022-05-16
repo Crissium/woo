@@ -7,5 +7,7 @@ make
 ```
 This game depends on SFML 2.5 and you need a C++17-compliant compiler to build (not necessarily Clang as in my Makefile).
 
+Note: The path of the font file used for rendering text is hard-coded. Modify if necessary!
+
 # Warning
 This is written for my C++ coursework assignment. Do not simply clone and pass it off as your own!
