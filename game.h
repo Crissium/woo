@@ -13,6 +13,8 @@ enum Player
 	Invalid
 };
 
+inline Player adversaryOf(const Player);
+
 class Square
 {
 private:
@@ -74,6 +76,7 @@ public:
 
 	Square &getSquare(int x, int y) { return squares.at(x + y * SideLen); }
 	const Square &getSquare(int x, int y) const { return squares.at(x + y * SideLen); }
+	const Square & getSquare(size_t moveIndex) const { return occupiedSquares.at(moveIndex); }
 	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
 	bool squareOccupied(int x, int y) const { return (getSquare(x, y).getPlayer() != Nobody); }
 
@@ -153,7 +156,7 @@ private:
 
 	bool terminal() const { return board.gameStatus() != 'r'; }
 
-	int lastMoveAnalysisResult(Player) const;
+	int recentMovesAnalysisResult(Player) const;
 
 	int utility(Player) const;
 
@@ -184,7 +187,7 @@ public:
 	GameState(const Board &b, int moveX, int moveY);
 	~GameState() {}
 
-	static size_t numMovesMadeSoFar;
+	static size_t numMovesMadeSoFarWhenCalled;
 
 	int minimax(Player, int depth) const;
 	int alphaBetaAnalysis(Player, int depth) const;

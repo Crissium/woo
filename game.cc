@@ -6,6 +6,11 @@
 #include <ctime>
 #include <iostream>
 
+Player adversaryOf(const Player p)
+{
+	return ((p == X) ? O : X);
+}
+
 const Square &Square::operator=(const Square &other)
 {
 	if (*this == other)
@@ -239,7 +244,7 @@ int MoveAnalyser::getScoreOfStrip(const PieceStrip &strip) const
 			{
 				if (strip.at(pieceSubscript + i) == evaluatedPlayer)
 					searched.push_back('1');
-				else if (strip.at(pieceSubscript + i) == ((evaluatedPlayer == X) ? O : X))
+				else if (strip.at(pieceSubscript + i) == adversaryOf(evaluatedPlayer))
 					searched.push_back('2');
 				else if (strip.at(pieceSubscript + i) == Nobody)
 					searched.push_back('0');
@@ -275,25 +280,39 @@ int MoveAnalyser::analysisResult() const
 						   { return previousScoreSum + getScoreOfStrip(s); });
 }
 
-size_t GameState::numMovesMadeSoFar = 0;
+size_t GameState::numMovesMadeSoFarWhenCalled = 0;
 
 GameState::GameState(const Board &b, int moveX, int moveY) : board(b, moveX, moveY)
 {
 }
 
-int GameState::lastMoveAnalysisResult(Player player) const
+int GameState::recentMovesAnalysisResult(Player player) const
 {
-	Player currentPlayer = board.getCurrentPlayer();
-	Player lastMover = ((currentPlayer == X) ? O : X);
+	int scoreSum = 0;
 
-	int score = MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY()).analysisResult(); // For the last mover, how brilliant the move was!
+	for (size_t moveIndex = numMovesMadeSoFarWhenCalled; moveIndex < board.numSquareOccupied(); ++moveIndex)
+	{
+		auto analysedSquare = board.getSquare(moveIndex);
+		Player thisMovesPlayer = analysedSquare.getPlayer();
 
-	score += MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY(), currentPlayer).analysisResult(); // From the last mover's point of view, if the adversary ever moved here, how terrible that would be! So it was lucky of me to block his wicked move.
+		int score = MoveAnalyser(board, analysedSquare.getX(), analysedSquare.getY()).analysisResult();
+		score += MoveAnalyser(board, analysedSquare.getX(), analysedSquare.getY(), adversaryOf(thisMovesPlayer)).analysisResult();
 
-	if (player == lastMover)
-		return score; // Boy, you did a good job!
-	else
-		return -score; // Damn, what a move the enemy has made!
+		if (thisMovesPlayer == player)
+			scoreSum += score;
+		else
+			scoreSum -= score;
+	}
+
+	return scoreSum;
+	// int score = MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY()).analysisResult(); // For the last mover, how brilliant the move was!
+
+	// score += MoveAnalyser(board, board.mostRecentlyModifiedSquare->getX(), board.mostRecentlyModifiedSquare->getY(), currentPlayer).analysisResult(); // From the last mover's point of view, if the adversary ever moved here, how terrible that would be! So it was lucky of me to block his wicked move.
+
+	// if (player == lastMover)
+	// 	return score; // Boy, you did a good job!
+	// else
+	// 	return -score; // Damn, what a move the enemy has made!
 }
 
 int GameState::utility(Player player) const
@@ -304,7 +323,7 @@ int GameState::utility(Player player) const
 		return 0;
 	else if (status == 'r')
 	{
-		return lastMoveAnalysisResult(player);
+		return recentMovesAnalysisResult(player);
 	}
 	else
 	{
@@ -403,7 +422,7 @@ bool Game::placePiece(int x, int y)
 	{
 		board.makeMove(x, y);
 
-		currentPlayer = ((currentPlayer == X) ? O : X);
+		currentPlayer = adversaryOf(currentPlayer);
 
 		return true;
 	}
@@ -441,7 +460,7 @@ bool Game::autoMove()
 					if (board.terminatingMove(x, y))
 						return placePiece(x, y);
 
-					GameState::numMovesMadeSoFar = board.numSquareOccupied();
+					GameState::numMovesMadeSoFarWhenCalled = board.numSquareOccupied();
 					int score = GameState(board, x, y).alphaBetaAnalysis(currentPlayer, aiDepth);
 					std::cout << '(' << y << ',' << x << ')' << ':' << score << '\n';
 					if (score > maxScore)
