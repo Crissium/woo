@@ -54,6 +54,7 @@ public:
 
 private:
 	std::array<Square, SideLen * SideLen> squares;
+	std::vector<Square> occupiedSquares;
 
 public:
 	Square *mostRecentlyModifiedSquare;
@@ -80,6 +81,9 @@ public:
 	inline Player getCurrentPlayer() const;
 	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
 	bool hasOccupiedSquaresNearby(int x, int y) const;
+
+	void makeMove(int x, int y);
+	void undo();
 
 	/**
 	 * Return 'r' if game is not over and still Running;
@@ -186,7 +190,6 @@ class Game
 {
 private:
 	Board board;
-	std::vector<Square> occupiedSquares;
 
 	Player currentPlayer;
 
@@ -200,7 +203,7 @@ public:
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
 	bool autoMove();
-	void undo();
+	inline void undo() {board.undo();}
 	void restart();
 
 	void setDepth(int depth) {aiDepth = depth;}
@@ -213,7 +216,7 @@ public:
 	 */
 	char gameStatus() const { return board.gameStatus(); }
 
-	const Square &getLastestMovedSquare() const { return *occupiedSquares.crbegin(); }
+	const Square &getLastestMovedSquare() const { return *board.mostRecentlyModifiedSquare; }
 };
 
 #endif

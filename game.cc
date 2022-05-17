@@ -135,6 +135,25 @@ Player Board::getCurrentPlayer() const
 	return ((numSquaresOccupiedBy(X) > numSquaresOccupiedBy(O)) ? O : X);
 }
 
+void Board::makeMove(int x, int y)
+{
+	getSquare(x, y).setPlayer(getCurrentPlayer());
+	mostRecentlyModifiedSquare = &getSquare(x, y);
+
+	occupiedSquares.push_back(getSquare(x, y));
+}
+
+void Board::undo()
+{
+	getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
+	occupiedSquares.pop_back();
+
+	getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
+	occupiedSquares.pop_back();
+
+	mostRecentlyModifiedSquare = &getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY());
+}
+
 void Board::clear()
 {
 	for (auto &it : squares)
@@ -142,6 +161,8 @@ void Board::clear()
 		if (it.getPlayer() != Nobody)
 			it.setPlayer(Nobody);
 	}
+
+	occupiedSquares.clear();
 }
 
 const std::array<const std::string, 22> MoveAnalyser::Patterns({"11111", "011110", "011112", "0101110", "0110110", "01110", "010110", "001112", "010112", "011012", "10011", "10101", "2011102", "00110", "01010", "010010", "000112", "001012", "010012", "10001", "2010102", "2011002"});
@@ -367,9 +388,7 @@ bool Game::placePiece(int x, int y)
 {
 	if (board.coordValid(x, y) && !board.squareOccupied(x, y))
 	{
-		board.getSquare(x, y).setPlayer(currentPlayer);
-		board.mostRecentlyModifiedSquare = &board.getSquare(x, y);
-		occupiedSquares.push_back(board.getSquare(x, y));
+		board.makeMove(x, y);
 
 		currentPlayer = ((currentPlayer == X) ? O : X);
 
@@ -382,11 +401,11 @@ bool Game::placePiece(int x, int y)
 bool Game::autoMove()
 {
 	// Make a very fast opening move
-	if (occupiedSquares.size() == 0)
+	if (board.numSquaresOccupiedBy(X) == 0)
 	{
 		return placePiece(Board::SideLen / 2, Board::SideLen / 2);
 	}
-	else if (occupiedSquares.size() == 1)
+	else if (board.numSquaresOccupiedBy(X) == 1)
 	{
 		if (!placePiece(Board::SideLen / 2, Board::SideLen / 2))
 			while (!placePiece(Board::SideLen / 2 + rand() % 3 - 1, Board::SideLen / 2 + rand() % 3 - 1))
@@ -428,20 +447,8 @@ bool Game::autoMove()
 	}
 }
 
-void Game::undo()
-{
-	board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
-	occupiedSquares.pop_back();
-
-	board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY()).setPlayer(Nobody);
-	occupiedSquares.pop_back();
-
-	board.mostRecentlyModifiedSquare = &board.getSquare(occupiedSquares.crbegin()->getX(), occupiedSquares.crbegin()->getY());
-}
-
 void Game::restart()
 {
 	board.clear();
-	occupiedSquares.clear();
 	currentPlayer = X;
 }
