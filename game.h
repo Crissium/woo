@@ -76,11 +76,11 @@ public:
 
 	Square &getSquare(int x, int y) { return squares.at(x + y * SideLen); }
 	const Square &getSquare(int x, int y) const { return squares.at(x + y * SideLen); }
-	const Square & getSquare(size_t moveIndex) const { return occupiedSquares.at(moveIndex); }
+	const Square &getSquare(size_t moveIndex) const { return occupiedSquares.at(moveIndex); }
 	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
 	bool squareOccupied(int x, int y) const { return (getSquare(x, y).getPlayer() != Nobody); }
 
-	inline size_t numSquareOccupied() const {return occupiedSquares.size();}
+	inline size_t numSquareOccupied() const { return occupiedSquares.size(); }
 	inline int numSquaresOccupiedBy(Player) const;
 	inline Player getCurrentPlayer() const;
 	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
@@ -166,7 +166,7 @@ private:
 	 */
 	inline GameState result(const Coord &move) const;
 
-	/** 
+	/**
 	 * Returns a vector of legal moves in this state,
 	 * i.e. Unoccupied Squares
 	 *
@@ -210,10 +210,10 @@ public:
 	Player getCurrentPlayer() const { return currentPlayer; }
 	bool makeMove(int x, int y) { return placePiece(x, y); }
 	bool autoMove();
-	inline void undo() {board.undo();}
+	inline void undo() { board.undo(); }
 	void restart();
 
-	void setDepth(int depth) {aiDepth = depth;}
+	void setDepth(int depth) { aiDepth = depth; }
 
 	/**
 	 * Return 'r' if game is not over and still Running;

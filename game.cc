@@ -105,7 +105,7 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	return surroundings;
 }
 
-Board::Board(const Board & other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr)
+Board::Board(const Board &other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr)
 {
 	std::transform(other.occupiedSquares.cbegin(), other.occupiedSquares.cend(), std::back_inserter(occupiedSquares), [this](const Square &s)
 				   { return getSquare(s.getX(), s.getY()); });
@@ -118,7 +118,7 @@ Board::Board(const Board &other, int moveX, int moveY) : squares(other.squares)
 
 	std::transform(other.occupiedSquares.cbegin(), other.occupiedSquares.cend(), std::back_inserter(occupiedSquares), [this](const Square &s)
 				   { return getSquare(s.getX(), s.getY()); });
-	
+
 	occupiedSquares.push_back(getSquare(moveX, moveY));
 }
 
