@@ -28,7 +28,7 @@ bool PieceStrip::hasAWinningConnection() const
 	return false;
 }
 
-Board::Board()
+Board::Board() : mostRecentlyModifiedSquare(nullptr)
 {
 	for (int x = 0; x < SideLen; ++x)
 	{
@@ -100,10 +100,21 @@ std::array<PieceStrip, 4> Board::getSurroundingPieces(int x, int y) const
 	return surroundings;
 }
 
+Board::Board(const Board & other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr)
+{
+	std::transform(other.occupiedSquares.cbegin(), other.occupiedSquares.cend(), std::back_inserter(occupiedSquares), [this](const Square &s)
+				   { return getSquare(s.getX(), s.getY()); });
+}
+
 Board::Board(const Board &other, int moveX, int moveY) : squares(other.squares)
 {
 	getSquare(moveX, moveY).setPlayer(getCurrentPlayer());
 	mostRecentlyModifiedSquare = &getSquare(moveX, moveY);
+
+	std::transform(other.occupiedSquares.cbegin(), other.occupiedSquares.cend(), std::back_inserter(occupiedSquares), [this](const Square &s)
+				   { return getSquare(s.getX(), s.getY()); });
+	
+	occupiedSquares.push_back(getSquare(moveX, moveY));
 }
 
 int Board::numSquaresOccupiedBy(Player player) const
@@ -263,6 +274,8 @@ int MoveAnalyser::analysisResult() const
 	return std::accumulate(analysedStrips.cbegin(), analysedStrips.cend(), 0, [this](int previousScoreSum, const PieceStrip &s)
 						   { return previousScoreSum + getScoreOfStrip(s); });
 }
+
+size_t GameState::numMovesMadeSoFar = 0;
 
 GameState::GameState(const Board &b, int moveX, int moveY) : board(b, moveX, moveY)
 {
@@ -428,6 +441,7 @@ bool Game::autoMove()
 					if (board.terminatingMove(x, y))
 						return placePiece(x, y);
 
+					GameState::numMovesMadeSoFar = board.numSquareOccupied();
 					int score = GameState(board, x, y).alphaBetaAnalysis(currentPlayer, aiDepth);
 					std::cout << '(' << y << ',' << x << ')' << ':' << score << '\n';
 					if (score > maxScore)

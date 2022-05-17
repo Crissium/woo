@@ -66,8 +66,8 @@ private:
 
 public:
 	Board();
-	Board(const Board &other) : squares(other.squares), mostRecentlyModifiedSquare(nullptr) {}
-	inline Board(const Board &other, int moveX, int moveY);
+	Board(const Board &other);
+	Board(const Board &other, int moveX, int moveY);
 	~Board() {}
 
 	const Board &operator=(const Board &other);
@@ -77,6 +77,7 @@ public:
 	bool coordValid(int x, int y) const { return (x >= 0 && x < SideLen && y >= 0 && y < SideLen); }
 	bool squareOccupied(int x, int y) const { return (getSquare(x, y).getPlayer() != Nobody); }
 
+	inline size_t numSquareOccupied() const {return occupiedSquares.size();}
 	inline int numSquaresOccupiedBy(Player) const;
 	inline Player getCurrentPlayer() const;
 	std::array<PieceStrip, 4 /* Num of directions */> getSurroundingPieces(int x, int y) const;
@@ -162,7 +163,8 @@ private:
 	 */
 	inline GameState result(const Coord &move) const;
 
-	/** Returns a vector of legal moves in this state,
+	/** 
+	 * Returns a vector of legal moves in this state,
 	 * i.e. Unoccupied Squares
 	 *
 	 * I am going to optimise this method
@@ -181,6 +183,8 @@ public:
 	GameState(const Board &b) : board(b) {}
 	GameState(const Board &b, int moveX, int moveY);
 	~GameState() {}
+
+	static size_t numMovesMadeSoFar;
 
 	int minimax(Player, int depth) const;
 	int alphaBetaAnalysis(Player, int depth) const;
