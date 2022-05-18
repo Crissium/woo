@@ -10,11 +10,15 @@ clean:
 	rm $(P) $(OBJS)
 
 install:
-	mkdir -p $(DESTDIR)/usr/share/woo
-	cp *.png *.otf $(DESTDIR)/usr/share/woo
-	chmod 644 $(DESTDIR)/usr/share/woo/*
+	mkdir -p $(DESTDIR)/usr/share/$(P)
+	cp *.png *.otf $(DESTDIR)/usr/share/$(P)
+	chmod 644 $(DESTDIR)/usr/share/$(P)/*
 	mkdir -p $(DESTDIR)/usr/bin
 	install -m 0755 $(P) $(DESTDIR)/usr/bin/$(P)
+
+uninstall:
+	rm -r $(DESTDIR)/usr/share/woo
+	rm /usr/bin/$(P)
 
 archive: main.cc game.h game.cc ui.h ui.cc
 	zip woo *.cc *.h *.png Makefile
