@@ -3,7 +3,6 @@
 #include <numeric>
 #include <fstream>
 #include <climits>
-#include <ctime>
 #include <iostream>
 
 Player adversaryOf(const Player p)
@@ -449,8 +448,6 @@ bool Game::autoMove()
 		int maxScore = INT_MIN;
 		int bestX = 0, bestY = 0;
 
-		time_t startTime = time(nullptr);
-
 		for (int x = 0; x < Board::SideLen; ++x)
 		{
 			for (int y = 0; y < Board::SideLen; ++y)
@@ -462,7 +459,6 @@ bool Game::autoMove()
 
 					GameState::numMovesMadeSoFarWhenCalled = board.numSquareOccupied();
 					int score = GameState(board, x, y).alphaBetaAnalysis(currentPlayer, aiDepth);
-					std::cout << '(' << y << ',' << x << ')' << ':' << score << '\n';
 					if (score > maxScore)
 					{
 						maxScore = score;
@@ -472,9 +468,6 @@ bool Game::autoMove()
 				}
 			}
 		}
-
-		std::cout << "Analysis took " << time(nullptr) - startTime << " second(s).\n"
-				  << std::endl;
 
 		return placePiece(bestX, bestY);
 	}
