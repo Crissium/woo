@@ -60,7 +60,7 @@ OSprite::OSprite(int x, int y)
 
 Status::Status()
 {
-	font.loadFromFile("/usr/share/fonts/truetype/MinionPro-Regular.otf");
+	font.loadFromFile("/usr/share/woo/MinionPro-Regular.otf");
 	setFont(font);
 
 	setPosition(0.f, Board::SideLen * PixelsPerUnit);

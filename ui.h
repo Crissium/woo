@@ -14,70 +14,70 @@ extern const unsigned int ConsoleHeight;
 class X1 : public sf::Texture
 {
 public:
-	X1() { loadFromFile("x1.png"); }
+	X1() { loadFromFile("/usr/share/woo/x1.png"); }
 	virtual ~X1() {}
 };
 
 class X2 : public sf::Texture
 {
 public:
-	X2() { loadFromFile("x2.png"); }
+	X2() { loadFromFile("/usr/share/woo/x2.png"); }
 	virtual ~X2() {}
 };
 
 class X3 : public sf::Texture
 {
 public:
-	X3() { loadFromFile("x3.png"); }
+	X3() { loadFromFile("/usr/share/woo/x3.png"); }
 	virtual ~X3() {}
 };
 
 class X4 : public sf::Texture
 {
 public:
-	X4() { loadFromFile("x4.png"); }
+	X4() { loadFromFile("/usr/share/woo/x4.png"); }
 	virtual ~X4() {}
 };
 
 class X5 : public sf::Texture
 {
 public:
-	X5() { loadFromFile("x5.png"); }
+	X5() { loadFromFile("/usr/share/woo/x5.png"); }
 	virtual ~X5() {}
 };
 
 class O1 : public sf::Texture
 {
 public:
-	O1() { loadFromFile("o1.png"); }
+	O1() { loadFromFile("/usr/share/woo/o1.png"); }
 	virtual ~O1() {}
 };
 
 class O2 : public sf::Texture
 {
 public:
-	O2() { loadFromFile("o2.png"); }
+	O2() { loadFromFile("/usr/share/woo/o2.png"); }
 	virtual ~O2() {}
 };
 
 class O3 : public sf::Texture
 {
 public:
-	O3() { loadFromFile("o3.png"); }
+	O3() { loadFromFile("/usr/share/woo/o3.png"); }
 	virtual ~O3() {}
 };
 
 class O4 : public sf::Texture
 {
 public:
-	O4() { loadFromFile("o4.png"); }
+	O4() { loadFromFile("/usr/share/woo/o4.png"); }
 	virtual ~O4() {}
 };
 
 class O5 : public sf::Texture
 {
 public:
-	O5() { loadFromFile("o5.png"); }
+	O5() { loadFromFile("/usr/share/woo/o5.png"); }
 	virtual ~O5() {}
 };
 
