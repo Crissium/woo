@@ -6,10 +6,10 @@ Get it from Open Build Service: [woo](https://software.opensuse.org/package/woo)
 
 # Controls
 
-Z: undo last two moves
-R: restart game
-A: Let AI make a move for you
-Num 1-6: set AI search depth
+- Z: undo last two moves
+- R: restart game
+- A: Let AI make a move for you
+- Num 1-6: set AI search depth
 
 # Build
 
