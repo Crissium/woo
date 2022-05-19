@@ -18,7 +18,7 @@ $ make
 # make install # install with this command
 ```
 
-This game depends on SFML 2.5 and you need a C++17-compliant compiler to build (not necessarily Clang as in my Makefile).
+This game depends on SFML 2.5 and you need a C++17-compliant compiler to build.
 
 Note: The paths of the font file and images used for rendering is hard-coded.
 
